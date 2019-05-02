@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package Models;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+enum Taste {
+  NONE = 0;
+  SOUR = 1;
+  BITTER = 2;
+  SWEET = 3;
+  SALTY = 4;
+}
+
+message Fruit {
+  int64 Id = 1;
+  double Weight = 2;
+  string Name = 3;
+  int32 NumSeeds = 4;
+  Taste Taste = 5;
+}
+
+message Tree {
+  int64 Id = 1;
+  float Height = 2;
+  int32 Age = 3;
+  repeated Fruit Fruits = 4;
+}
+
+message Fountain {
+  int32 Id = 1;
+  repeated int32 Streams = 2;
+  bytes SerialNr = 3;
+  google.protobuf.Timestamp LastRun = 4;
+  google.protobuf.Duration RunFor = 5;
+}
+
+message Flower {
+  int64 Id = 1;
+  string Smell = 2;
+  int32 Color = 3;
+  bool IsBlooming = 4;
+  google.protobuf.Int32Value NumPetals = 5; // null when not blooming
+}
+
+message Garden {
+  int32 Id = 1;
+  repeated Tree Trees = 2;
+  Fountain Fountain = 3;
+  map<int64, Flower> Flowers = 4;
+}
