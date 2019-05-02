@@ -1,16 +1,22 @@
-Example use of Google Protocol Buffers with EntityFrameworkCore to generate DAO / DB schema for EF from proto definitions
+## Example use of Google Protocol Buffers with EntityFrameworkCore to generate DAO / DB schema for EF from proto definitions
 
 Compile (from ProtoGardenEF project dir)
-
-  dotnet.exe build
+```
+dotnet.exe build
+```
 
 Create / apply migrations to local db file
-  dotnet.exe ef database update
+```
+dotnet.exe ef database update
+```
 
 Re-generate migrations
-  rm -fr Migrations
-  dotnet.exe ef migrations create Initial
+```
+rm -fr Migrations
+dotnet.exe ef migrations create Initial
+```
 
 Run
-  dotnet.exe run
-
+```
+dotnet.exe run
+```
