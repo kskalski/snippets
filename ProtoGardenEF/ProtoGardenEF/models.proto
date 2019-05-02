@@ -31,7 +31,7 @@ message Tree {
 
 message Fountain {
   int32 Id = 1;
-  repeated int32 Streams = 2;
+  repeated int32 Streams = 2;  // This field can't be mapped yet
   bytes SerialNr = 3;
   google.protobuf.Timestamp LastRun = 4;
   google.protobuf.Duration RunFor = 5;
@@ -49,5 +49,5 @@ message Garden {
   int32 Id = 1;
   repeated Tree Trees = 2;
   Fountain Fountain = 3;
-  map<int64, Flower> Flowers = 4;
+  map<int64, Flower> Flowers = 4;  // This field can't be mapped yet
 }

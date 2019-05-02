@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
-namespace ProtoGardenEF
-{
-  class Program
-  {
+namespace ProtoGardenEF {
+  class Program {
     static void PopulateDb() {
       using (var db = new Database()) {
         db.Fruits.Add(new Models.Fruit { Name = "Apple", Weight = 345.2, Taste = Models.Taste.Sour });

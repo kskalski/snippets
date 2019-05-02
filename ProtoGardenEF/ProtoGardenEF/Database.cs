@@ -1,13 +1,8 @@
 ﻿using Google.Protobuf;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
 
 namespace ProtoGardenEF {
-  internal class Database : DbContext
-  {
+  class Database : DbContext {
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
       optionsBuilder.UseSqlite("Data Source=garden.db");
     }
@@ -24,8 +19,8 @@ namespace ProtoGardenEF {
         .HasConversion(v => v.ToTimeSpan(), v => Google.Protobuf.WellKnownTypes.Duration.FromTimeSpan(v));
 
       /* 
-       * I would love to use map<int64, Garden>, which generates a MapField<long, Gargen> as
-       * navigatonal property, where Garden <- Flower relationship is represenced using Flowers' ids.
+       * I would love to use map<int64, Garden>, which generates a MapField<long, Garden> as
+       * navigational property, where Garden <- Flower relationship is represenced using Flowers' ids.
        * But it's not possible at the moment.
        * 
          modelBuilder.Entity<Models.Garden>()
