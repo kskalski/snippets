@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf;
+using GPW = Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -7,6 +8,9 @@ namespace ProtoGardenEF {
   class Program {
     static void PopulateDb() {
       using (var db = new Database()) {
+        db.Database.EnsureDeleted();
+        db.Database.Migrate();
+
         db.Fruits.Add(new Models.Fruit { Name = "Apple", Weight = 345.2, Taste = Models.Taste.Sour });
         db.Trees.Add(new Models.Tree {
           Height = 45, Fruits = {
@@ -16,8 +20,8 @@ namespace ProtoGardenEF {
         db.Gardens.Add(new Models.Garden() {
           Fountain = new Models.Fountain() {
             SerialNr = ByteString.CopyFromUtf8("AbraKadabra"),
-            LastRun = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow),
-            RunFor = new Google.Protobuf.WellKnownTypes.Duration() { Seconds = 34 }
+            LastRun = GPW.Timestamp.FromDateTime(DateTime.UtcNow),
+            RunFor = new GPW.Duration() { Seconds = 34 }
           },
           Trees = { new Models.Tree() { Age = 2 } }
         });
@@ -46,9 +50,21 @@ namespace ProtoGardenEF {
       }
     }
 
+    static void SearchDb(string[] args) {
+      using (var db = new Database()) {
+        if (args.Contains("timestamp_compare")) {
+          var recent_fountain_run = db.Fountains
+            .Where(f => f.LastRun > GPW.Timestamp.FromDateTime(DateTime.UtcNow.Subtract(TimeSpan.FromDays(2))))
+            .Select(f => Tuple.Create(f.Id, f.LastRun)).FirstOrDefault();
+          Console.WriteLine("recently run fountain id: {0}", recent_fountain_run);
+        }
+      }
+    }
+
     static void Main(string[] args) {
       PopulateDb();
       ReadDb();
+      SearchDb(args);
     }
   }
 }
