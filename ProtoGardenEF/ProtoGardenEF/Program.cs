@@ -54,7 +54,7 @@ namespace ProtoGardenEF {
       using (var db = new Database()) {
         if (args.Contains("timestamp_compare")) {
           var recent_fountain_run = db.Fountains
-            .Where(f => f.LastRun > GPW.Timestamp.FromDateTime(DateTime.UtcNow.Subtract(TimeSpan.FromDays(2))))
+            .Where(f => f.LastRun > GPW.Timestamp.FromDateTimeOffset(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(2))))
             .Select(f => Tuple.Create(f.Id, f.LastRun)).FirstOrDefault();
           Console.WriteLine("recently run fountain id: {0}", recent_fountain_run);
         }
