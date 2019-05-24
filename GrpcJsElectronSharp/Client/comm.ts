@@ -1,6 +1,5 @@
 ﻿import * as grpc from '@grpc/grpc-js';
 import * as proto_loader from '@grpc/proto-loader';
-import * as proto from './protos';
 
 const PROTO_PATH = 'Client/win-ia32-unpacked/resources/protos/gateway.proto';
 var packageDefinition = proto_loader.loadSync(
@@ -19,7 +18,7 @@ export class CommunicationClient {
     this.grpc_client = new elector_proto.ElectorGateway('127.0.0.1:15745', creds);
   }
 
-  public StartWindowControl(handler: (req: proto.WindowFormsToExternal) => proto.WindowExternalToForms): Communicator {
+  public StartWindowControl(handler: (req) => any): Communicator {
     var call = this.grpc_client.WindowControl();
     return new Communicator(call, handler);
   }

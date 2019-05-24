@@ -1,9 +1,8 @@
 ﻿import { app, BrowserWindow, dialog } from 'electron';
 import { CommunicationClient, Communicator } from './comm';
-import * as proto from './protos';
 
 class Main {
-    private handle_request(req: proto.WindowFormsToExternal): proto.WindowExternalToForms {
+    private handle_request(req) {
         console.log('Handling request', req);
         return null;
     }
