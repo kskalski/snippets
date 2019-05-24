@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+import "window_control.proto";
+
+service ElectorGateway {
+  rpc WindowControl(stream WindowExternalToForms) returns (stream WindowFormsToExternal) {}
+}

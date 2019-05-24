@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+
+message WindowFormsToExternal {
+  string window = 1;
+  string action = 2;
+  repeated string args = 3;
+
+  int32 ExternalSequenceNr = 4;
+  int32 FormsSequenceNr = 5;
+}
+message WindowExternalToForms {
+  string window = 1;
+  string action = 2;
+  repeated string args = 3;
+
+  int32 ExternalSequenceNr = 4;
+  int32 FormsSequenceNr = 5;
+}

@@ -1,0 +1,61 @@
+{
+  "name": "Client",
+  "version": "1.0.0",
+  "description": "Client",
+  "main": "main.js",
+  "author": "Skalware",
+  "license": "ISC",
+  "build": {
+    "appId": "client.UI",
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        "dir"
+      ]
+    },
+    "compression": "normal",
+    "files": [
+      "!**/*.{ts,c,h,md,cmd,csproj,user,scss}",
+      "!{bin,obj}"
+    ],
+    "electronDownload": {
+      "arch": "ia32"
+    },
+    "directories": {
+      "output": "."
+    },
+    "extraFiles": [
+      {
+        "from": "../protos",
+        "to": "resources/protos",
+        "filter": "*.proto"
+      }
+    ]
+  },
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "npm rebuild --target=5.0.1 --runtime=electron --dist-url=https://atom.io/download/electron"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.2",
+    "tmp": "0.0.33",
+    "uglify-js": "^3.5.12",
+    "espree": "^3.5.4",
+    "escodegen": "^1.11.1",
+    "estraverse": "^4.2.0",
+    "devtron": "^1.4.0",
+    "semver": "^5.5.0",
+    "electron": "5.0.1",
+    "electron-debug": "^3.0.0",
+    "electron-devtools-installer": "^2.2.4",
+    "electron-builder": "latest"
+  },
+  "dependencies": {
+    "@grpc/proto-loader": "^0.5.1",
+    "asar": "^2.0.1",
+    "google-protobuf": "^3.7.0",
+    "grpc": "1.20.3",
+    "@grpc/grpc-js": "0.4.0",
+    "minimist": "^1.2.0"
+  }
+}
