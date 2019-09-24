@@ -1,0 +1,13 @@
+﻿syntax = "proto3";
+package pro.elector.proto;
+
+service ElectorTunnel {
+  rpc OpenTerminalChannel(stream TunnelMessage) returns (stream TunnelMessage) {}
+  rpc OpenElectorChannel(stream TunnelMessage) returns (stream TunnelMessage) {}
+}
+
+message TunnelMessage {
+  int64 target_id = 1;
+  int64 source_id = 2;
+  bytes payload = 3;
+}
