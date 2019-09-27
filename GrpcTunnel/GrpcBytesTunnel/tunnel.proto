@@ -2,8 +2,17 @@
 package pro.elector.proto;
 
 service ElectorTunnel {
-  rpc OpenTerminalChannel(stream TunnelMessage) returns (stream TunnelMessage) {}
-  rpc OpenElectorChannel(stream TunnelMessage) returns (stream TunnelMessage) {}
+  // Registers caller as client in tunneled connection
+  //   metadata should contain key target_id with identifier of server side
+  // Availability (appearance and disappearance) of server with matching identifier is
+  // notified by message with empty payload and source_id set to identifier of the server
+  // (i.e. always equals to target_id from metadata)
+  rpc OpenChannelAsClient(stream TunnelMessage) returns (stream TunnelMessage) {}
+
+  // Registers caller as server in tunneled connection.
+  // Appearance and disapparance of matching client that points to this server's id as target
+  // is notified by message with empty payload and source_id set to identifier of such client.
+  rpc OpenChannelAsServer(stream TunnelMessage) returns (stream TunnelMessage) {}
 }
 
 message TunnelMessage {

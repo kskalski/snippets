@@ -11,8 +11,7 @@ namespace Pro.Elector.Communication {
    * Task for forwarding data between network stream (e.g. from socket server) to gRPC tunnel.
    */ 
   class NetworkStreamToTunnelRelay {
-    public NetworkStreamToTunnelRelay(string v, NetworkStream networkStream, IAsyncStreamReader<TunnelMessage> responseStream, IAsyncStreamWriter<TunnelMessage> requestStream) {
-      this.name_ = v;
+    public NetworkStreamToTunnelRelay(NetworkStream networkStream, IAsyncStreamReader<TunnelMessage> responseStream, IAsyncStreamWriter<TunnelMessage> requestStream) {
       this.target_id_ = -1;
       this.stream_ = networkStream;
       this.in_queue_ = responseStream;
@@ -32,11 +31,11 @@ namespace Pro.Elector.Communication {
             var bytes = has_next ? in_queue_.Current.Payload : null;
             if (bytes != null) {
               if (bytes.Length == 0) {
-                Console.WriteLine("zero message at {0} from {1}", name_, in_queue_.Current.SourceId);
+                log_.InfoFormat("zero message from {0}", in_queue_.Current.SourceId);
                 target_id_ = in_queue_.Current.SourceId;
                 read_task = stream_.ReadAsync(incoming_bytes_, 0, incoming_bytes_.Length);
               } else {
-                Console.WriteLine("writing {0} ({1})", bytes.Length, name_);
+                log_.DebugFormat("writing {0}", bytes.Length);
                 bytes.WriteTo(stream_);
               }
               tunnel_read_task = in_queue_.MoveNext();
@@ -46,7 +45,7 @@ namespace Pro.Elector.Communication {
           } else {
             if (read_task.Result == 0)
               break;
-            Console.WriteLine("read {0} ({1}), sending to {2}", read_task.Result, name_, target_id_);
+            log_.DebugFormat("read {0}, sending to {1}", read_task.Result, target_id_);
             tunnel_write_task = out_queue_.WriteAsync(new TunnelMessage() {
               TargetId = target_id_, Payload = Google.Protobuf.ByteString.CopyFrom(incoming_bytes_, 0, read_task.Result)
             });
@@ -54,21 +53,22 @@ namespace Pro.Elector.Communication {
           }
         }
       } catch (Exception e) {
-        Console.WriteLine("exception in test rely {0}", e);
+        log_.Warn("exception in network to tunnel rely", e);
       }
     }
 
-    readonly string name_;
     long target_id_;
     readonly NetworkStream stream_;
     readonly IAsyncStreamReader<TunnelMessage> in_queue_;
     readonly IAsyncStreamWriter<TunnelMessage> out_queue_;
     readonly byte[] incoming_bytes_ = new byte[4096];
+
+    static readonly log4net.ILog log_ = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
   }
 
   /*
    * Socket server forwarding connections and byte transfers to gRPC tunnel call.
-   */ 
+   */
   public class SocketServerToGrpcTunnel {
     public SocketServerToGrpcTunnel(AsyncDuplexStreamingCall<TunnelMessage, TunnelMessage> call) {
       this.terminal_call_ = call;
@@ -86,8 +86,8 @@ namespace Pro.Elector.Communication {
         //just fire and forget. We break from the "forgotten" async loops
         //in AcceptClientsAsync using a CancellationToken from `cts`
         await AcceptClientsAsync(listener, cts.Token);
-      } catch {
-        Console.WriteLine("exception on test client");
+      } catch(Exception e) {
+        log_.Warn("exception on tcp listening", e);
       } finally {
         cts.Cancel();
         listener.Stop();
@@ -103,29 +103,31 @@ namespace Pro.Elector.Communication {
           clientCounter++;
           //once again, just fire and forget, and use the CancellationToken
           //to signal to the "forgotten" async invocation.
-          EchoAsync(client, clientCounter, ct);
+          PassBytesFromSocketToTunnel(client, clientCounter, ct);
         }
       } catch (Exception e) {
-        Console.WriteLine("Exception in accept {0}", e);
+        log_.Warn("Exception in accept", e);
       }
     }
-    async Task EchoAsync(TcpClient client, int clientIndex, CancellationToken ct) {
+    async Task PassBytesFromSocketToTunnel(TcpClient client, int clientIndex, CancellationToken ct) {
       try {
-        Console.WriteLine("New client ({0}) connected", clientIndex);
+        log_.InfoFormat("New client ({0}) connected", clientIndex);
         using (client) {
           var buf = new byte[4096];
           var stream = client.GetStream();
           //var server_rely = new Rely("server", stream, reply_queue_, received_queue_);
-          var server_rely = new NetworkStreamToTunnelRelay("server", stream, this.terminal_call_.ResponseStream, this.terminal_call_.RequestStream);
+          var server_rely = new NetworkStreamToTunnelRelay(stream, this.terminal_call_.ResponseStream, this.terminal_call_.RequestStream);
           await server_rely.Run();
         }
       } catch (Exception e) {
-        Console.WriteLine("Exception in echo async {0}", e);
+        log_.Warn("Exception in passing bytes from socket to tunnel", e);
       } finally {
-        Console.WriteLine("Client ({0}) disconnected", clientIndex);
+        log_.InfoFormat("Client ({0}) disconnected", clientIndex);
       }
     }
 
     AsyncDuplexStreamingCall<TunnelMessage, TunnelMessage> terminal_call_;
+
+    static readonly log4net.ILog log_ = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
   }
 }

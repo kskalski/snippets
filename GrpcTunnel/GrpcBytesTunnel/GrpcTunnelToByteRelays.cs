@@ -203,7 +203,7 @@ namespace Pro.Elector.Communication {
     void start_call() {
       log_.DebugFormat("Establishing tunnel stream to {0}", tunnel_channel_.Target);
       var tunnel_client = new Proto.ElectorTunnel.ElectorTunnelClient(tunnel_channel_);
-      tunnel_call_ = tunnel_client.OpenElectorChannel();
+      tunnel_call_ = tunnel_client.OpenChannelAsServer();
     }
 
     void maybe_close_call() {
