@@ -113,7 +113,8 @@ namespace Pro.Elector.Communication {
           wait_before_call_ms = Math.Min(10000, Math.Max(10, wait_before_call_ms * 2));
 
           Task<bool> tunnel_read_task = in_stream.MoveNext(canceller_.Token);
-          Task tunnel_write_task = Async.NeverEndingTask<object>.Instance;
+          // Send message marking this server as active
+          Task tunnel_write_task = tunnel_call_.RequestStream.WriteAsync(new Proto.TunnelMessage());
           Task<Task<bool>> relays_task = Async.NeverEndingTask<Task<bool>>.Instance;
 
           while (!canceller_.IsCancellationRequested) {
@@ -201,7 +202,7 @@ namespace Pro.Elector.Communication {
     IAsyncStreamReader<Proto.TunnelMessage> in_stream { get => tunnel_call_.ResponseStream; }
 
     void start_call() {
-      log_.DebugFormat("Establishing tunnel stream to {0}", tunnel_channel_.Target);
+      log_.InfoFormat("Establishing tunnel stream to {0}", tunnel_channel_.Target);
       var tunnel_client = new Proto.ElectorTunnel.ElectorTunnelClient(tunnel_channel_);
       tunnel_call_ = tunnel_client.OpenChannelAsServer();
     }

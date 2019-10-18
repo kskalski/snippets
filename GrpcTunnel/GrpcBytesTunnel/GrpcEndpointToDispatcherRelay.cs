@@ -76,7 +76,15 @@ namespace Pro.Elector.Communication {
   }
 
   public interface IDispatcher<T> {
+    /** Directs message to appropriate endpoint registered in this dispatcher. */
     void Send(long source_id, T message);
+
+    /** Registers endpoint to be managed by this dispatcher and receive messages sent through it.
+     * target_server_id == null denotes that endpoint is a server, otherwise it's a client side
+     */
+    bool AddEndpoint(GrpcEndpointToDispatcherRelay<T> endpoint, long? target_server_id);
+
+    /** Removes endpoint from being managed by this dispatcher and receive messages sent through it. */
     void RemoveEndpoint(long id);
   }
 }
