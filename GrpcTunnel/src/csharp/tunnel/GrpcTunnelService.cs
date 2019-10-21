@@ -203,7 +203,7 @@ namespace Pro.Elector.Communication {
 
     GrpcEndpointToDispatcherRelay<TunnelMessage> create_endpoint_handler(IAsyncStreamReader<TunnelMessage> req, IServerStreamWriter<TunnelMessage> res, ServerCallContext context) {
       var id = IdentifyPeer(context);
-      log_.InfoFormat("agent from peer {0} = {1} ({2})", context.Peer, id, Utils.Strings.ToAlphanumericString(id));
+      log_.InfoFormat("agent from peer {0} = {1} ({2})", context.Peer, id, Convert.ToBase64String(BitConverter.GetBytes(id ?? 0L)));
       if (id != null)
         return new GrpcEndpointToDispatcherRelay<TunnelMessage>(id.Value, req, res, context.CancellationToken, this);
       return null;

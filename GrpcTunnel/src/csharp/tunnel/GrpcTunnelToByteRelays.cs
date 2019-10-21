@@ -77,8 +77,9 @@ namespace Pro.Elector.Communication {
    * Messages with empty payload are markers for requested creation and disposal of byte relays for given SourceId.
    */ 
   public class GrpcTunnelToByteRelays {
-    public GrpcTunnelToByteRelays(Channel tunnel_channel, IByteRelayFactory relay_factory) {
+    public GrpcTunnelToByteRelays(Channel tunnel_channel, Metadata tunnel_metadata, IByteRelayFactory relay_factory) {
       tunnel_channel_ = tunnel_channel;
+      tunnel_metadata_ = tunnel_metadata;
       relay_factory_ = relay_factory;
     }
 
@@ -204,7 +205,7 @@ namespace Pro.Elector.Communication {
     void start_call() {
       log_.InfoFormat("Establishing tunnel stream to {0}", tunnel_channel_.Target);
       var tunnel_client = new Proto.ElectorTunnel.ElectorTunnelClient(tunnel_channel_);
-      tunnel_call_ = tunnel_client.OpenChannelAsServer();
+      tunnel_call_ = tunnel_client.OpenChannelAsServer(headers: tunnel_metadata_);
     }
 
     void maybe_close_call() {
@@ -248,6 +249,7 @@ namespace Pro.Elector.Communication {
 
     // Initialized on construction
     readonly Channel tunnel_channel_;
+    private readonly Metadata tunnel_metadata_;
     readonly IByteRelayFactory relay_factory_;
 
     // Initialized on start-up and re-connections

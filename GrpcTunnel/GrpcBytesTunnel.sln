@@ -1,9 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcBytesTunnel", "GrpcBytesTunnel\GrpcBytesTunnel.csproj", "{E83E1A78-3303-40C2-9126-E2667E4E2E89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcBytesTunnel", "src\csharp\tunnel\GrpcBytesTunnel.csproj", "{E83E1A78-3303-40C2-9126-E2667E4E2E89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "example", "src\csharp\example\example.csproj", "{6DE52C3D-C866-4824-BB01-E0697E7A7243}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{18F16AAB-F41F-4017-9B5F-97CE0AA39FDE}"
+	ProjectSection(SolutionItems) = preProject
+		src\proto\example.proto = src\proto\example.proto
+		src\proto\tunnel.proto = src\proto\tunnel.proto
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,10 @@ Global
 		{E83E1A78-3303-40C2-9126-E2667E4E2E89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E83E1A78-3303-40C2-9126-E2667E4E2E89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E83E1A78-3303-40C2-9126-E2667E4E2E89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DE52C3D-C866-4824-BB01-E0697E7A7243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DE52C3D-C866-4824-BB01-E0697E7A7243}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DE52C3D-C866-4824-BB01-E0697E7A7243}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DE52C3D-C866-4824-BB01-E0697E7A7243}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

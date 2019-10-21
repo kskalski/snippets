@@ -33,6 +33,9 @@ namespace Pro.Elector.Communication {
               if (bytes.Length == 0) {
                 log_.InfoFormat("zero message from {0}", in_queue_.Current.SourceId);
                 target_id_ = in_queue_.Current.SourceId;
+                // Received server availability message, also send out client connection initiation
+                // message.
+                out_queue_.WriteAsync(new TunnelMessage() { TargetId = target_id_ }).Wait();
                 read_task = stream_.ReadAsync(incoming_bytes_, 0, incoming_bytes_.Length);
               } else {
                 log_.DebugFormat("writing {0}", bytes.Length);

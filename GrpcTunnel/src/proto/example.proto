@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package example;
+
+service Example {
+  rpc Reverse (ExampleRequest) returns (ExampleResponse) {}
+}
+
+message ExampleRequest {
+	string Text = 1;
+}
+
+message ExampleResponse {
+	string ReversedText = 1;
+}

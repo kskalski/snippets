@@ -7,11 +7,17 @@ service ElectorTunnel {
   // Availability (appearance and disappearance) of server with matching identifier is
   // notified by message with empty payload and source_id set to identifier of the server
   // (i.e. always equals to target_id from metadata)
+  // After call is made and information about server's availability is received,
+  // a message with empty payload should be sent whenever client becomes
+  // active (attempts to connect to target server) or ceases to be active (disconnects).
   rpc OpenChannelAsClient(stream TunnelMessage) returns (stream TunnelMessage) {}
 
   // Registers caller as server in tunneled connection.
   // Appearance and disapparance of matching client that points to this server's id as target
   // is notified by message with empty payload and source_id set to identifier of such client.
+  // After call is made, a message with empty payload should be sent whenever server becomes
+  // active (is available to receive client connections) or ceases to be active (disconnects
+  // all active connections).
   rpc OpenChannelAsServer(stream TunnelMessage) returns (stream TunnelMessage) {}
 }
 
