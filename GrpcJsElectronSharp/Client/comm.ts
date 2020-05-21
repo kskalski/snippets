@@ -19,7 +19,7 @@ export class CommunicationClient {
   }
 
   public StartWindowControl(handler: (req) => any): Communicator {
-    var call = this.grpc_client.WindowControl();
+    var call = this.grpc_client.WindowControl(new grpc.Metadata({ waitForReady: true }));
     return new Communicator(call, handler);
   }
 
