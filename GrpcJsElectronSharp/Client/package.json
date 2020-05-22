@@ -54,7 +54,7 @@
   "dependencies": {
     "@grpc/proto-loader": "^0.5.4",
     "asar": "^2.0.1",
-    "@grpc/grpc-js": "0.7.5",
+    "@grpc/grpc-js": "1.0.4",
     "minimist": "^1.2.0"
   }
 }
