@@ -25,8 +25,10 @@ class Main {
         win.on("close", (event) => app.quit());
         win.on("minimize", (event) => {
             console.log('sending');
-            setImmediate(() =>
-              this.ui_communicator.SendMessage({ window: "main", action: Date.now().toString() }, (resp) => dialog.showMessageBox(resp)));
+        //    setImmediate(() =>
+              this.ui_communicator.SendMessage({ window: "main", action: Date.now().toString() }, (resp) => dialog.showMessageBox(resp))
+        //)
+         ;
         });
         win.show();
       //  setInterval(() => this.ui_communicator.SendMessage({ window: "main", action: Date.now().toString() }, (resp) => dialog.showMessageBox(resp)), 1000);

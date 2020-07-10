@@ -1,0 +1,6 @@
+Client/*.js
+Client/*.map
+Client/node_modules
+Client/win-ia32-unpacked/
+*/bin
+*/obj
