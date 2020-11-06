@@ -27,7 +27,7 @@ public class GrpcMessager<T, R, A> : IDisposable
     }
   }
 
-  public GrpcMessager(IAsyncStreamWriter<T> sink, IAsyncEnumerator<R> source, Func<R, T> req_handler) {
+  public GrpcMessager(IAsyncStreamWriter<T> sink, IAsyncStreamReader<R> source, Func<R, T> req_handler) {
     requests_sink_ = sink;
     responses_source_ = source;
     seq_accessor_ = new A();
@@ -138,7 +138,7 @@ public class GrpcMessager<T, R, A> : IDisposable
   PendingExchange pending_ = new PendingExchange(1);
   readonly Func<R, T> peer_requests_handler_;
   readonly IAsyncStreamWriter<T> requests_sink_;
-  readonly IAsyncEnumerator<R> responses_source_;
+  readonly IAsyncStreamReader<R> responses_source_;
   readonly IMessageSequencesAccessor<T, R> seq_accessor_;
 }
 
