@@ -21,7 +21,7 @@ namespace ProtoGardenEF {
       /* 
        * I would love to use map<int64, Garden>, which generates a MapField<long, Garden> as
        * navigational property, where Garden <- Flower relationship is represenced using Flowers' ids.
-       * But it's not possible at the moment.
+       * But it's not possible at the moment (https://github.com/dotnet/efcore/issues/21262).
        * 
          modelBuilder.Entity<Models.Garden>()
         .Property(m => m.Flowers)

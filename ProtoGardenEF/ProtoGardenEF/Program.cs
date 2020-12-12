@@ -14,7 +14,9 @@ namespace ProtoGardenEF {
       db.Fruits.Add(new Models.Fruit { Name = "Apple", Weight = 345.2, Taste = Models.Taste.Sour });
       db.Trees.Add(new Models.Tree {
         Height = 45, Fruits = {
-            new Models.Fruit { Name = "Banana", Weight = 25.1 }
+            new Models.Fruit { Name = "Banana", Weight = 25.1 },
+            new Models.Fruit { Name = "Orange", Weight = 30 },
+            new Models.Fruit { Name = "Mango", Weight = 40 }
           }
       });
       db.Gardens.Add(new Models.Garden() {
@@ -29,6 +31,26 @@ namespace ProtoGardenEF {
       db.Flowers.Add(new Models.Flower() { IsBlooming = false, Color = 5 });
       var count = db.SaveChanges();
       Console.WriteLine("{0} records saved to database", count);
+    }
+
+    static void ManipulateTree() {
+      using var db = new Database();
+      var tree = db.Trees.Include(t => t.Fruits).First();
+      Console.WriteLine("Tree before manipulating: {0}", tree.Fruits);
+      var apple = db.Fruits.First(f => f.Name == "Apple");
+      tree.Fruits.RemoveAt(2);
+      tree.Fruits.RemoveAt(1);
+      tree.Fruits.Add(apple);
+      db.SaveChanges();
+    }
+
+    static void AttachToTree() {
+      using var db = new Database();
+      var tree = db.Trees.First();
+      Console.WriteLine("Tree before attaching: {0}", tree.Fruits);
+      var orange = db.Fruits.First(f => f.Name == "Mango");
+      tree.Fruits.Add(orange);
+      db.SaveChanges();
     }
 
     static void ReadDb() {
@@ -62,6 +84,10 @@ namespace ProtoGardenEF {
       PopulateDb();
       ReadDb();
       SearchDb(args);
+      ManipulateTree();
+      ReadDb();
+      AttachToTree();
+      ReadDb();
     }
   }
 }
