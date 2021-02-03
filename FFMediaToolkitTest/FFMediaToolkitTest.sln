@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFMediaAudio", "FFMediaAudio\FFMediaAudio.csproj", "{C675F705-439C-4A92-855F-5D54C5A16887}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C675F705-439C-4A92-855F-5D54C5A16887}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C675F705-439C-4A92-855F-5D54C5A16887}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C675F705-439C-4A92-855F-5D54C5A16887}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C675F705-439C-4A92-855F-5D54C5A16887}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B42FFF2-EC49-46F7-A812-F3E1A2D98BC4}
+	EndGlobalSection
+EndGlobal

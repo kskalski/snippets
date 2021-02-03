@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Mp3Test": {
+      "commandName": "Project",
+      "commandLineArgs": "d:\\todo\\sample.mp3"
+    }
+  }
+}
