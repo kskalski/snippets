@@ -7,7 +7,7 @@ using FFMediaToolkit.Decoding;
 namespace Mp3Test {
 
    
-    public class Extraction : IDisposable, IEnumerator<byte[]> {
+    public class Extraction : IDisposable, IEnumerator<Tuple<byte[], int>> {
       static Extraction() {
         FFmpegLoader.FFmpegPath = "../../../../Lib";
       }
@@ -38,15 +38,14 @@ namespace Mp3Test {
 
       public TimeSpan TimePosition => media_file_.Audio.Position;
 
-      public byte[] Current => chunk_;
-      object System.Collections.IEnumerator.Current => chunk_;
+      public Tuple<byte[], int> Current => Tuple.Create(linear_bytes_, available_bytes_);
+      object System.Collections.IEnumerator.Current => linear_bytes_;
 
-      public byte[] FetchNextChunk() {
+      int FetchNextChunk() {
         int offset = 0;
         if (media_file_.Audio != null) {
           while (offset < linear_bytes_.Length && TimePosition < end_limit_) {
             try {
-              //var frame = media_file_.Audio.ReadNextFrame();
               if (!media_file_.Audio.TryGetNextFrame(out FFMediaToolkit.Audio.AudioData frame)) {
                 Console.WriteLine("No more frames available at {0}", TimePosition);
                 break;
@@ -58,9 +57,12 @@ namespace Mp3Test {
                 linear_bytes_[offset++] = (byte)(a & 0xFF);
                 linear_bytes_[offset++] = (byte)(a >> 8);
               }
+              frame.Dispose();
+
               // break earlier if buffer doesn't seem to have enough date for next frame
               if (linear_bytes_.Length - offset < channel.Length * 2)
                 break;
+
             } catch (EndOfStreamException) {
               Console.WriteLine("Encountered end of audio stream");
               break;
@@ -69,9 +71,7 @@ namespace Mp3Test {
             }
           }
         }
-        chunk_ = new byte[offset];
-        Array.Copy(linear_bytes_, 0, chunk_, 0, offset);
-        return chunk_;
+        return offset;
       }
 
       public void Dispose() {
@@ -80,11 +80,11 @@ namespace Mp3Test {
       }
 
       public bool MoveNext() {
-        return FetchNextChunk().Length > 0;
+        return (available_bytes_ = FetchNextChunk()) > 0;
       }
 
       readonly byte[] linear_bytes_ = new byte[1 << 20];
-      byte[] chunk_;
+      int available_bytes_;
       TimeSpan end_limit_ = TimeSpan.MaxValue;
       readonly MediaFile media_file_;
     }
@@ -94,7 +94,7 @@ namespace Mp3Test {
     static void Process(string filename) {
       using var e = new Extraction(filename);
       while (e.MoveNext())
-        Console.WriteLine("chunk with size {0}", e.Current.Length);
+        Console.WriteLine("chunk with size {0}", e.Current.Item2);
     }
 
     static void Main(string[] args) {

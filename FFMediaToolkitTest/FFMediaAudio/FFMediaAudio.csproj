@@ -10,12 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="FFMediaToolkit">
-      <HintPath>..\FFMediaToolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="FFmpeg.AutoGen">
-      <HintPath>..\FFmpeg.AutoGen.dll</HintPath>
-    </Reference>
+    <PackageReference Include="FFMediaToolkit" Version="4.0.1" />
+    <PackageReference Include="FFmpeg.AutoGen" Version="4.3.1" />
   </ItemGroup>
 
 </Project>

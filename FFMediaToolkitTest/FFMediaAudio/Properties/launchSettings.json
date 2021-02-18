@@ -2,7 +2,7 @@
   "profiles": {
     "Mp3Test": {
       "commandName": "Project",
-      "commandLineArgs": "d:\\todo\\sample.mp3"
+      "commandLineArgs": "d:\\todo\\XXV.mp4"
     }
   }
 }
