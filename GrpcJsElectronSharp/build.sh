@@ -8,4 +8,6 @@ ${NPM} install --target-arch=ia32 --arch=ia32 --scripts-prepend-node-path=true -
 
 ${MSBUILD} /restore GrpcJsElectronSharp.sln 
 
+cd Client && ${NPM} run build && cd ..
+
 ${NODE_EXE} Client/node_modules/electron-builder/out/cli/cli.js --project='Client' --ia32   
