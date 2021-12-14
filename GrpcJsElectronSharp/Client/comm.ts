@@ -1,7 +1,11 @@
 ﻿import * as grpc from '@grpc/grpc-js';
 import * as proto_loader from '@grpc/proto-loader';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 
-const PROTO_PATH = 'Client/win-ia32-unpacked/resources/protos/gateway.proto';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const PROTO_PATH = __dirname + '/win-ia32-unpacked/resources/protos/gateway.proto';
 var packageDefinition = proto_loader.loadSync(
     PROTO_PATH,
     {keepCase: true,

@@ -64,7 +64,7 @@ public class GrpcMessager<T, R, A> : IDisposable
         }
 
         if (receving_task.IsCompleted) {
-          Console.WriteLine("At {0} received something {1}", DateTime.Now.ToLongTimeString(), receving_task);
+          Console.WriteLine("At {0} received something {1}", DateTime.Now.ToLongTimeString(), receving_task.Status);
           if (receving_task.IsFaulted || receving_task.IsCanceled || !receving_task.Result)
             break;
 

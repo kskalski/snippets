@@ -3,11 +3,13 @@
   "compilerOptions": {
     "noImplicitAny": false,
     "noEmitOnError": true,
+    "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "removeComments": false,
     "sourceMap": true,
     "strictBindCallApply": true,
-    "target": "es5",
+    "target": "es2019",
+    "module": "es2020",
     "lib": [ "dom", "es5", "scripthost", "es2015.core", "es2015.proxy" ]
   },
   "exclude": [
