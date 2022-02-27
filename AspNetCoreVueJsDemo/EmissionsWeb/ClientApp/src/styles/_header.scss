@@ -1,0 +1,142 @@
+/* Header */
+.app-header {	
+	@include box-shadow(0 1px 4px 0 rgba(0,0,0,.1));
+	border-bottom: 1px solid $theme-border-color;
+	height: 56px;
+	background: #fff;
+}
+
+.app-header-inner {
+	position: relative;
+}
+
+
+.app-search-form {
+    position: relative;
+    max-width: 600px;
+    
+	.search-input {
+		font-size: 0.875rem;
+		@include border-radius(0.25rem);
+		padding-right: 3rem;
+		padding-left: 1rem;
+		
+		&:focus {
+			border-color: $theme-border-color;
+		}
+	}
+	.search-btn {
+		color: lighten($theme-text-color-secondary, 15%);
+		background: none;
+		border: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+		margin-right: 0;
+		padding: 0.5rem 1rem;
+		
+		
+		
+		&:active, &:focus, &:hover {
+			outline: none !important;
+			color: $theme-color-primary;
+			@include box-shadow(none);
+			
+		}
+		
+	}
+}
+
+.app-utility-item {
+	display: inline-block;
+	margin-right: 1.25rem;
+	&:last-child {
+		margin-right: 0;
+	}
+	& > a {
+		color: $theme-text-color-secondary;
+		&:hover {
+			color: $theme-text-color-primary;
+		}
+	}
+	.dropdown-toggle {
+		position: relative;
+	}
+	.dropdown-menu {
+		font-size: 0.875rem;
+		margin: 0;
+	}
+	.dropdown-menu.show {
+		top: 23px !important;
+	}
+	.icon {
+		font-size: 1.25rem;
+		width: 34px;
+		height: 34px;	
+	}
+	.icon-badge {
+		display: inline-block;
+		@include border-radius(50%);
+		position: absolute;
+		right: -0.45rem;
+		top: -0.3rem;
+		width: 20px;
+		height: 20px;
+		font-size: 0.6rem;
+		font-weight: bold;
+		padding-top: 1px;
+		color: #fff;
+		text-align: center;
+		&.icon-badge {
+			background: $theme-color-count;
+			border: 2px solid #fff;
+		}
+	}
+}
+
+
+// X-Large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) { 	
+	.app-header-inner {
+		margin-left: 250px; //side panel width;
+	}
+}
+
+
+// X-Small devices (portrait phones, less than 576px)
+@media (max-width: 575.98px) {
+	.search-mobile-trigger {
+		cursor: pointer;
+		@include opacity(0.8);
+		&:hover {
+			color: $theme-color-primary;
+			@include opacity(1);
+		}
+
+	}
+	.app-search-box {
+		display: none;
+		position: absolute;
+	    left: 0;
+	    top: 56px;
+	    padding: 0;
+	    height: 100vh;
+	    background: rgba(0, 0, 0, 0.5);
+	    @include transition (all 0.4s ease-in-out);
+	    .app-search-form {
+		    .search-input {
+			    @include border-radius(0);
+			    padding-top: 1.5rem;
+			    padding-bottom: 1.5rem;
+		    }
+		    .search-btn {
+			    top: 7px;
+		    }
+		    
+	    }
+	    
+	    &.is-visible {
+		    display: block;
+	    }
+	}
+}
