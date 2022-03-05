@@ -1,6 +1,8 @@
+.vs
 Client/*.js
 Client/*.map
 Client/node_modules
 Client/win-ia32-unpacked/
+Client/builder-*.y*ml
 */bin
 */obj
