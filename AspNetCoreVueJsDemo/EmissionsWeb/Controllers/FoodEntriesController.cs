@@ -14,8 +14,9 @@ namespace Emissions.Controllers {
     [Authorize]
     [ApiController]
     public class CarbonEntriesController : ControllerAppCommon {
-        public CarbonEntriesController(ApplicationDbContext context, UserManager<ApplicationUser> users, ILogger<CarbonEntriesController> logger): 
+        public CarbonEntriesController(ApplicationDbContext context, NotificationQueue notifier, ILogger<CarbonEntriesController> logger): 
             base(context, logger) {
+            notifier_ = notifier;
         }
 
         // GET: api/CarbonEntries
@@ -76,6 +77,7 @@ namespace Emissions.Controllers {
 
             try {
                 await context_.SaveChangesAsync();
+                notifier_.AddNotification(carbon_entry.UserId, new Proto.Notifications.ListenResponse() { EntriesChanged = true });
             } catch (DbUpdateConcurrencyException) {
                 if (!carbon_entry_exists(id))
                     return NotFound();
@@ -101,6 +103,7 @@ namespace Emissions.Controllers {
 
             context_.CarbonEntries.Add(carbon_entry);
             await context_.SaveChangesAsync();
+            notifier_.AddNotification(carbon_entry.UserId, new Proto.Notifications.ListenResponse() { EntriesChanged = true });
 
             return CreatedAtAction("GetCarbonEntry", new { id = carbon_entry.Id }, carbon_entry);
         }
@@ -127,6 +130,7 @@ namespace Emissions.Controllers {
 
             context_.CarbonEntries.Remove(carbon_entry);
             await context_.SaveChangesAsync();
+            notifier_.AddNotification(carbon_entry.UserId, new Proto.Notifications.ListenResponse() { EntriesChanged = true });
 
             return NoContent();
         }
@@ -144,5 +148,7 @@ namespace Emissions.Controllers {
 
         bool is_admin() => User.IsInRole(Parameters.ADMIN_ROLE);
         bool is_regular_user() => !is_admin();
+
+        NotificationQueue notifier_;
     }
 }

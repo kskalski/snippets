@@ -30,6 +30,8 @@
     export default class App extends Vue {
         @Getter(AccountsStore.MODULE + AccountsStore.GET_IS_ADMIN)
         isAdmin: boolean;
+        @Getter(AccountsStore.MODULE + AccountsStore.GET_REQUEST_HEADERS)
+        authHeaders: Record<string, Record<string, string>>;
 
         @Action(UserSummaryStore.MODULE + UserSummaryStore.DO_FETCH_SUMMARY)
         doRefreshUserSummary: () => Promise<void>;
@@ -46,7 +48,9 @@
         }
 
         async runNotificationStream() {
-            const transport = new GrpcWebFetchTransport({ baseUrl: window.location.origin });
+            const transport = new GrpcWebFetchTransport({
+                baseUrl: window.location.origin, meta: this.authHeaders.headers
+            });
             const client = new WebNotifierClient(transport);
             for await (const r of client.listen({}).responses) {
                 if (r.reportsChanged)
