@@ -1,0 +1,9 @@
+﻿syntax = "proto3";
+
+package emissions.proto.services;
+
+import "notifications.proto";
+
+service WebNotifier {
+  rpc Listen(notifications.ListenRequest) returns (stream notifications.ListenResponse);
+}

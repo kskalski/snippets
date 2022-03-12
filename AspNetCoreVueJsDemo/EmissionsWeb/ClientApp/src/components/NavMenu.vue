@@ -5,7 +5,7 @@
                 <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
                 <div class="app-branding">
                     <router-link class="app-logo" :to="{ path: '/' }">
-                        <img class="logo-icon me-2" src="/favicon.ico" alt="logo">
+                        <img class="logo-icon me-2" src="/favicon.png" alt="logo">
                         <span class="logo-text">EMISSIONS</span>
                     </router-link>
                 </div>

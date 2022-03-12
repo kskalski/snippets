@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package emissions.proto.notifications;
+
+message ListenRequest {
+}
+message ListenResponse {
+  bool EntriesChanged = 1;
+  bool ReportsChanged = 2;
+}

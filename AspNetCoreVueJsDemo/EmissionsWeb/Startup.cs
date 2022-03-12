@@ -30,7 +30,7 @@ namespace Emissions {
                           IssuerSigningKey = DevBootstrap.FAKE_SECRET_KEY
                       };
                   });
-
+            services.AddGrpc();
             services.AddControllers().AddJsonOptions(options => {
                 options.JsonSerializerOptions.DictionaryKeyPolicy = null;
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
@@ -60,8 +60,10 @@ namespace Emissions {
             app.UseSpaStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseGrpcWeb();
 
             app.UseEndpoints(endpoints => {
+                endpoints.MapGrpcService<Controllers.WebNotifierGrpcService>().EnableGrpcWeb();
                 endpoints.MapControllers();
             });
 

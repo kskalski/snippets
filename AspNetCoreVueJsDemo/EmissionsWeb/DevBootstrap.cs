@@ -21,9 +21,10 @@ namespace Emissions {
 
             var user_manager = service_provider.GetRequiredService<UserManager<Data.ApplicationUser>>();
             var users = new List<Tuple<Data.ApplicationUser, string>>() { 
-                Tuple.Create(new Data.ApplicationUser { UserName = "admin" }, Data.Parameters.ADMIN_ROLE) };
+                Tuple.Create(new Data.ApplicationUser { Id = "123-admin-1", UserName = "admin" }, Data.Parameters.ADMIN_ROLE) };
             for (int i = 1; i <= 3; ++i) {
                 users.Add(Tuple.Create(new Data.ApplicationUser {
+                    Id = $"123-user-{i}",
                     UserName = $"user{i}",
                     DailyEmissionsWarningThreshold = Data.Parameters.DEFAULT_DAILY_EMISSIONS_WARNING_THRESHOLD,
                     MontlyExpensesWarningThreshold = Data.Parameters.DEFAULT_MONTHLY_EXPENSES_WARNING_THRESHOLD

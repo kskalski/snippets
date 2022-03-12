@@ -9,19 +9,23 @@
 
   <PropertyGroup>
     <SpaRoot>ClientApp\</SpaRoot>
-    <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
+	<Protobuf_Root>..\EmissionsModelCore\protos</Protobuf_Root>
+	<Protobuf_TsOut>$(SpaRoot)src\protos</Protobuf_TsOut>
+	<DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
+    <PackageReference Include="Grpc.AspNetCore" Version="2.43.0" />
+    <PackageReference Include="Grpc.AspNetCore.Web" Version="2.43.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.2">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -58,9 +62,29 @@
 
   <ItemGroup>
     <Folder Include="ClientApp\src\assets\" />
+    <Folder Include="ClientApp\src\protos\" />
   </ItemGroup>
 
-  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
+  <ItemGroup>
+    <ProjectReference Include="..\EmissionsModelCore\EmissionsModelCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Protobuf_Input Include="$(Protobuf_Root)\**\*.proto"></Protobuf_Input>
+  </ItemGroup>
+	
+  <Target Name="ProtoCompile" 
+		  Inputs="@(Protobuf_Input)" Outputs="@(Protobuf_Input -> '$(Protobuf_TsOut)\%(RelativeDir)%(Filename).ts')"
+		  DependsOnTargets="Protobuf_ResolvePlatform" BeforeTargets="Build">
+	<PropertyGroup>
+		<Protobuf_TsPlugin>$(SpaRoot)node_modules\.bin\protoc-gen-ts.cmd</Protobuf_TsPlugin>
+		<ProtoCCommand>$(Protobuf_ProtocFullPath) --plugin=protoc-gen-ts="$(Protobuf_TsPlugin)" --ts_out="$(Protobuf_TsOut)" -I "$(Protobuf_Root)"</ProtoCCommand>
+	</PropertyGroup>
+	<Message Importance="high" Text="$(ProtoCCommand) @(Protobuf_Input, ' ')" />
+	<Exec Command="$(ProtoCCommand) @(Protobuf_Input, ' ')" />
+  </Target>
+	
+  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build;ProtoCompile" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="true">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
