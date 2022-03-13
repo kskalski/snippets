@@ -77,7 +77,7 @@ namespace Emissions.Controllers {
 
             try {
                 await context_.SaveChangesAsync();
-                notifier_.AddNotification(carbon_entry.UserId, new Proto.Notifications.ListenResponse() { EntriesChanged = true });
+                notify(carbon_entry);
             } catch (DbUpdateConcurrencyException) {
                 if (!carbon_entry_exists(id))
                     return NotFound();
@@ -86,6 +86,13 @@ namespace Emissions.Controllers {
             }
 
             return NoContent();
+        }
+
+        void notify(CarbonEntry carbon_entry) {
+            notifier_.AddNotification(carbon_entry.UserId, new Proto.Notifications.ListenResponse() { EntriesChanged = true, ReportsChanged = true });
+            var current_user_id = currentUserId();
+            if (current_user_id != carbon_entry.UserId)
+                notifier_.AddNotification(current_user_id, new Proto.Notifications.ListenResponse() { EntriesChanged = true, ReportsChanged = true });
         }
 
         // POST: api/CarbonEntries
@@ -103,7 +110,7 @@ namespace Emissions.Controllers {
 
             context_.CarbonEntries.Add(carbon_entry);
             await context_.SaveChangesAsync();
-            notifier_.AddNotification(carbon_entry.UserId, new Proto.Notifications.ListenResponse() { EntriesChanged = true });
+            notify(carbon_entry);
 
             return CreatedAtAction("GetCarbonEntry", new { id = carbon_entry.Id }, carbon_entry);
         }
@@ -130,7 +137,7 @@ namespace Emissions.Controllers {
 
             context_.CarbonEntries.Remove(carbon_entry);
             await context_.SaveChangesAsync();
-            notifier_.AddNotification(carbon_entry.UserId, new Proto.Notifications.ListenResponse() { EntriesChanged = true });
+            notify(carbon_entry);
 
             return NoContent();
         }

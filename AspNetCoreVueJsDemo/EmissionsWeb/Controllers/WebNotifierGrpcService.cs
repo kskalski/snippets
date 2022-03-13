@@ -1,6 +1,7 @@
 ﻿using Emissions.Proto.Notifications;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
@@ -65,8 +66,9 @@ namespace Emissions.Controllers {
 
     [Authorize]
     public class WebNotifierGrpcService: Proto.Services.WebNotifier.WebNotifierBase {
-        public WebNotifierGrpcService(NotificationQueue notifications) {
+        public WebNotifierGrpcService(NotificationQueue notifications, ILogger<WebNotifierGrpcService> logger) {
             notifications_ = notifications;
+            log_ = logger;
         }
 
         public async override Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context) {
@@ -80,6 +82,8 @@ namespace Emissions.Controllers {
                     var notification = await client.NextNotification(context.CancellationToken);
                     await responseStream.WriteAsync(notification);
                 }
+            } catch (TaskCanceledException e) {
+                log_.LogDebug("Finishing Listen handling {0}", e.Message);
             } finally {
                 notifications_.RemoveEndpoint(user_id);
             }
@@ -88,6 +92,7 @@ namespace Emissions.Controllers {
         protected string currentUserId(ClaimsPrincipal user) =>
             user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        NotificationQueue notifications_ = new();
+        readonly NotificationQueue notifications_ = new();
+        readonly ILogger log_;
     }
 }

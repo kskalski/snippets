@@ -97,7 +97,7 @@
         doSaveEntry: (e: CarbonEntry) => Promise<boolean>;
 
         @Action(CarbonEntriesStore.MODULE + CarbonEntriesStore.DO_DELETE_ENTRY)
-        doDeleteEntry: (e: number) => Promise<void>;
+        doDeleteEntry: (e: number) => Promise<boolean>;
 
         carbonEntry: CarbonEntry | null = null;
 
@@ -115,8 +115,8 @@
                 this.handleBack();
         }
         async handleDelete() {
-            await this.doDeleteEntry(this.entryId);
-            this.handleBack();
+            if (await this.doDeleteEntry(this.entryId))
+                this.handleBack();
         }
         handleBack() {
             this.$router.push('/carbon_entries');

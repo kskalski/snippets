@@ -48,15 +48,22 @@
         }
 
         async runNotificationStream() {
-            const transport = new GrpcWebFetchTransport({
-                baseUrl: window.location.origin, meta: this.authHeaders.headers
-            });
-            const client = new WebNotifierClient(transport);
-            for await (const r of client.listen({}).responses) {
-                if (r.reportsChanged)
-                    await this.refreshReport();
-                if (r.entriesChanged)
-                    await this.doRefreshEntries();
+            while (true) {
+                const transport = new GrpcWebFetchTransport({
+                    baseUrl: window.location.origin, meta: this.authHeaders.headers
+                });
+                const client = new WebNotifierClient(transport);
+                try {
+                    for await (const r of client.listen({}).responses) {
+                        if (r.reportsChanged)
+                            await this.refreshReport();
+                        if (r.entriesChanged)
+                            await this.doRefreshEntries();
+                    }
+                } catch (e) {
+                    console.error('notification listen problem ', e);
+                }
+                await new Promise((resolve, reject) => setTimeout(resolve, 2000));
             }
         }
 

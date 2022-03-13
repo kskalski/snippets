@@ -2,7 +2,6 @@
 import * as vuex from 'vuex';
 import { CarbonEntriesState, CarbonEntry, RootState } from '@/store/store-types';
 import { AccountsStore } from './Accounts';
-import { UserSummaryStore } from './UserSummary';
 import { DatesUtil } from '../DatesUtil';
 
 const CARBON_ENTRIES_API_ENDPOINT = '/api/CarbonEntries';
@@ -86,13 +85,13 @@ const actions: vuex.ActionTree<CarbonEntriesState, RootState> = {
         }
         return null;
     },
-    async [CarbonEntriesStore.DO_DELETE_ENTRY]({ dispatch, rootGetters }, id: number) {
+    async [CarbonEntriesStore.DO_DELETE_ENTRY]({ commit, rootGetters }, id: number) {
         const response = await client(rootGetters).delete(`${CARBON_ENTRIES_API_ENDPOINT}/${id}`);
-        if (response.status == 204)
-            await Promise.all([
-                dispatch(CarbonEntriesStore.DO_FETCH_ENTRIES, true),
-                dispatch(UserSummaryStore.MODULE + UserSummaryStore.DO_FETCH_SUMMARY, null, { root: true })
-            ]);
+        if (response.status != 204) {
+            commit(CarbonEntriesStore.UPDATE_ERROR, response.data ?? { error: response.statusText });
+            return false;
+        }
+        return true;
     },
     async [CarbonEntriesStore.DO_SAVE_ENTRY]({ commit, dispatch, rootGetters }, entry: CarbonEntry) {
         try {
@@ -104,10 +103,6 @@ const actions: vuex.ActionTree<CarbonEntriesState, RootState> = {
             commit(CarbonEntriesStore.UPDATE_ERROR, e.response?.data ?? { error: e });
             return false;
         }
-        await Promise.all([
-            dispatch(CarbonEntriesStore.DO_FETCH_ENTRIES, true),
-            dispatch(UserSummaryStore.MODULE + UserSummaryStore.DO_FETCH_SUMMARY, null, { root: true })
-        ]);
         return true;
     },
 }
