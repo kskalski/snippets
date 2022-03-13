@@ -1,0 +1,4 @@
+﻿[*.{cs,vb}]
+
+# IDE0040: Dodaj modyfikatory dostępności
+dotnet_style_require_accessibility_modifiers = omit_if_default

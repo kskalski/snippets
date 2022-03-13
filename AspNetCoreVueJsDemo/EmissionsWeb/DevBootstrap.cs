@@ -47,11 +47,12 @@ namespace Emissions {
             var credentials = new SigningCredentials(FAKE_SECRET_KEY, SecurityAlgorithms.HmacSha256);
 
             //Create a List of Claims, Keep claims name short    
-            var permClaims = new List<Claim>();
-            permClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            permClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-            permClaims.Add(new Claim(ClaimTypes.Name, user.UserName));
-            permClaims.Add(new Claim(ClaimTypes.Role, role));
+            var permClaims = new List<Claim> {
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, role)
+            };
 
             //Create Security Token object by giving required parameters    
             var token = new JwtSecurityToken(
@@ -64,7 +65,7 @@ namespace Emissions {
             return jwt_token;
         }
 
-        internal static readonly SymmetricSecurityKey FAKE_SECRET_KEY = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("my_secret_key_12345"));    
+        internal static readonly SymmetricSecurityKey FAKE_SECRET_KEY = new (System.Text.Encoding.UTF8.GetBytes("my_secret_key_12345"));    
         internal const string FAKE_ISSUER = "http://localhost";
     }
 }

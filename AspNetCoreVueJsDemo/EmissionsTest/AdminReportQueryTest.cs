@@ -1,10 +1,8 @@
 ﻿using Emissions.Data;
-using Emissions.Utils;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Emissions.Test {
     public class AdminReportQueryTest {
@@ -14,11 +12,11 @@ namespace Emissions.Test {
         }
 
         AdminReport.AddedEntriesCounts run_added_entries_query(DateTime until_timestamp) {
-            var day_counts = Controllers.AdminReportController.AddedEntriesDayCountsQuery(entries_.AsQueryable(), until_timestamp).ToArray();
-            return Controllers.AdminReportController.CalculateAddedEntriesStats(day_counts);
+            var day_counts = Core.Queries.AddedEntriesDayCountsQuery(entries_.AsQueryable(), until_timestamp).ToArray();
+            return Core.Queries.CalculateAddedEntriesStats(day_counts);
         }
         AdminReport.EmissionsByUsers? run_avg_emissions_query(DateTime until_timestamp) {
-            return Controllers.AdminReportController.EmissionsPerUserStatsQuery(entries_.AsQueryable(), until_timestamp).SingleOrDefault();
+            return Core.Queries.EmissionsPerUserStatsQuery(entries_.AsQueryable(), until_timestamp).SingleOrDefault();
         }
 
         [Test]
@@ -123,6 +121,6 @@ namespace Emissions.Test {
             Assert.AreEqual(7, stats.NumPrecedingWeek);
         }
 
-        List<CarbonEntry> entries_ = new();
+        readonly List<CarbonEntry> entries_ = new();
     }
 }

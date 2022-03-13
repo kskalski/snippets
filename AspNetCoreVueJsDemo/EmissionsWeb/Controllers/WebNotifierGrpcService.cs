@@ -55,13 +55,13 @@ namespace Emissions.Controllers {
                 client.AddNotification(notification);
         }
 
-        Dictionary<string, ActiveClient> active_clients_ = new();
-
         internal void RemoveEndpoint(string user_id) {
             lock (active_clients_) {
                 active_clients_.Remove(user_id);
             }
         }
+
+        readonly Dictionary<string, ActiveClient> active_clients_ = new();
     }
 
     [Authorize]

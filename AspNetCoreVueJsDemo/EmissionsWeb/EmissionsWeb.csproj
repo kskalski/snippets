@@ -72,10 +72,12 @@
   <ItemGroup>
 	<Protobuf_Input Include="$(Protobuf_Root)\**\*.proto"></Protobuf_Input>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
 	
-  <Target Name="ProtoCompile" 
-		  Inputs="@(Protobuf_Input)" Outputs="@(Protobuf_Input -> '$(Protobuf_TsOut)\%(RelativeDir)%(Filename).ts')"
-		  DependsOnTargets="Protobuf_ResolvePlatform" BeforeTargets="Build">
+  <Target Name="ProtoCompile" Inputs="@(Protobuf_Input)" Outputs="@(Protobuf_Input -> '$(Protobuf_TsOut)\%(RelativeDir)%(Filename).ts')" DependsOnTargets="Protobuf_ResolvePlatform" BeforeTargets="Build">
 	<PropertyGroup>
 		<Protobuf_TsPlugin>$(SpaRoot)node_modules\.bin\protoc-gen-ts.cmd</Protobuf_TsPlugin>
 		<ProtoCCommand>$(Protobuf_ProtocFullPath) --plugin=protoc-gen-ts="$(Protobuf_TsPlugin)" --ts_out="$(Protobuf_TsOut)" -I "$(Protobuf_Root)"</ProtoCCommand>

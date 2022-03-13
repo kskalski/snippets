@@ -34,56 +34,12 @@ namespace Emissions.Controllers {
 
             return new UserSummary() {
                 UserDailyEmissionsLimit = user.DailyEmissionsWarningThreshold,
-                Emissions = await GroupEmissionsPerDayAndFindExceeding(
+                Emissions = await Core.Queries.GroupEmissionsPerDayAndFindExceeding(
                     user_entries, until.Value, max_num_emissions_items, user.DailyEmissionsWarningThreshold).ToListAsync(),
                 UserMonthlyExpensesLimit = user.MontlyExpensesWarningThreshold,
-                Expenses = await GroupMonthlyExpensesAndFindExceeding(
+                Expenses = await Core.Queries.GroupMonthlyExpensesAndFindExceeding(
                     user_entries, until.Value, max_num_expenses_items, user.MontlyExpensesWarningThreshold).ToListAsync()
             };
-        }
-
-        public static IQueryable<UserSummary.EmissionsExceededItem> GroupEmissionsPerDayAndFindExceeding(
-            IQueryable<CarbonEntry> source, 
-            DateTimeOffset until_timestamp, 
-            int max_num_items, 
-            double emissions_threshold) {
-
-            until_timestamp = Utils.Dates.MoveUpToNearestMidnight(until_timestamp);
-            var utc_to_user_offset_h = until_timestamp.Offset.TotalHours;
-            return source
-                .Where(e => e.EmittedTimestamp < until_timestamp.UtcDateTime)
-                .GroupBy(e => e.EmittedTimestamp.AddHours(utc_to_user_offset_h).Date)
-                .Select(g => new UserSummary.EmissionsExceededItem() {
-                    Day = g.Key.AddHours(-utc_to_user_offset_h),
-                    Emissions = g.Sum(e => e.Emissions)
-                })
-                .Where(e => e.Emissions > emissions_threshold)
-                .OrderByDescending(e => e.Day)
-                .Take(max_num_items);
-        }
-
-        public static IQueryable<UserSummary.ExpensesExceededItem> GroupMonthlyExpensesAndFindExceeding(
-            IQueryable<CarbonEntry> source, 
-            DateTimeOffset until_timestamp, 
-            int max_num_items, 
-            decimal expenses_threshold) {
-
-            until_timestamp = Utils.Dates.MoveUpToNearestMonthStart(until_timestamp);
-            var utc_to_user_offset_h = until_timestamp.Offset.TotalHours;
-            return source
-                .Where(e => e.EmittedTimestamp < until_timestamp.UtcDateTime && e.Price != null)
-                .GroupBy(e => new {
-                    Year = e.EmittedTimestamp.AddHours(utc_to_user_offset_h).Year,
-                    Month = e.EmittedTimestamp.AddHours(utc_to_user_offset_h).Month
-                })
-                .Select(g => new UserSummary.ExpensesExceededItem() {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    Expenses = g.Sum(e => e.Price.Value)
-                })
-                .Where(e => e.Expenses > expenses_threshold)
-                .OrderByDescending(e => e.Year).ThenByDescending(e => e.Month)
-                .Take(max_num_items);
         }
     }
 }

@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmissionsWeb", "EmissionsWe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmissionsTest", "EmissionsTest\EmissionsTest.csproj", "{DD52A479-8592-4A01-BF85-62781AC2FE90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissionsModelCore", "EmissionsModelCore\EmissionsModelCore.csproj", "{0CD4F40E-C864-4AFF-BBCC-5A5F64862E91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmissionsModelCore", "EmissionsModelCore\EmissionsModelCore.csproj", "{0CD4F40E-C864-4AFF-BBCC-5A5F64862E91}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0A7C02DC-5850-4AFA-B035-C00E87C439AF}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

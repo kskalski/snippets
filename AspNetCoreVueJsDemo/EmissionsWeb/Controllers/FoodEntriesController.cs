@@ -156,6 +156,6 @@ namespace Emissions.Controllers {
         bool is_admin() => User.IsInRole(Parameters.ADMIN_ROLE);
         bool is_regular_user() => !is_admin();
 
-        NotificationQueue notifier_;
+        readonly NotificationQueue notifier_;
     }
 }

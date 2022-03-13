@@ -12,11 +12,11 @@ namespace Emissions.Test {
         }
 
         List<UserSummary.EmissionsExceededItem> run_emissions_query(DateTimeOffset until_timestamp, int max_items, double threshold) {
-            return Controllers.UserSummaryController.GroupEmissionsPerDayAndFindExceeding(
+            return Core.Queries.GroupEmissionsPerDayAndFindExceeding(
                 entries_.AsQueryable(), until_timestamp, max_items, threshold).ToList();
         }
         List<UserSummary.ExpensesExceededItem> run_expenses_query(DateTimeOffset until_timestamp, int max_items, decimal threshold) {
-            return Controllers.UserSummaryController.GroupMonthlyExpensesAndFindExceeding(
+            return Core.Queries.GroupMonthlyExpensesAndFindExceeding(
                 entries_.AsQueryable(), until_timestamp, max_items, threshold).ToList();
         }
 
@@ -248,6 +248,6 @@ namespace Emissions.Test {
 
         static readonly DateTime MAX_UTC_DATE = DateTime.MaxValue.AddMonths(-1).ToUniversalTime().Date;
 
-        List<CarbonEntry> entries_ = new();
+        readonly List<CarbonEntry> entries_ = new();
     }
 }
