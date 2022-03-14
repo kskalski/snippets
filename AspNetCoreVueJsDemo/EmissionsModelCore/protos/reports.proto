@@ -27,6 +27,31 @@ message AdminReport {
   EmissionsByUsers UsersEmissions  = 2;
 }
 
+message UserSummary {
+  message EmissionsExceededItem {
+    google.protobuf.Timestamp Day = 1;
+    double Emissions = 2;
+  }
+   
+  message ExpensesExceededItem {
+    int32 Year = 1;
+    int32 Month = 2;
+    double Expenses = 3;
+  }
+
+  double UserDailyEmissionsLimit = 1;
+  double UserMonthlyExpensesLimit = 2;
+
+  repeated EmissionsExceededItem Emissions = 3;
+  repeated ExpensesExceededItem Expenses = 4;
+}
+
 message AdminReportRequest {
-  google.protobuf.Timestamp until = 1;
+  google.protobuf.Timestamp Until = 1;
+}
+message UserSummaryRequest {
+  google.protobuf.Timestamp Until = 1;
+  int32 UntilTzOffsetMinutes = 2;
+  optional int32 MaxNumEmissionsItems = 3;
+  optional int32 MaxNumExpensesItems = 4;
 }

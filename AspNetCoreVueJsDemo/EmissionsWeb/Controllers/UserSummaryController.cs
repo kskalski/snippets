@@ -1,45 +1,56 @@
 ﻿using Emissions.Data;
+using Emissions.Proto.Reports;
+using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Emissions.Controllers {
-    [Route("api/[controller]")]
     [Authorize]
-    [ApiController]
-    public class UserSummaryController : ControllerAppCommon {
-        public UserSummaryController(ApplicationDbContext context, ILogger<UserSummaryController> logger): base(context, logger) {
+    public class UserSummaryController : Proto.Services.UserSummaries.UserSummariesBase {
+        public UserSummaryController(ApplicationDbContext context, ILogger<UserSummaryController> logger) {
+            context_ = context;
+            log_ = logger;
         }
 
-        // GET: api/UserSummary
-        [HttpGet]
-        public async Task<ActionResult<UserSummary>> GetUserSummaryOfExceededThresholds(
-            DateTimeOffset? until, 
-            int max_num_emissions_items = Parameters.USER_SUMMARY_DEFAULT_EMISSIONS_ITEMS, 
-            int max_num_expenses_items = Parameters.USER_SUMMARY_DEFAULT_EXPENSE_ITEMS) {
+        public override async Task<UserSummary> GetUserSummaryOfExceededThresholds(
+            UserSummaryRequest request, ServerCallContext context) {
+            var user_id = currentUserId(context.GetHttpContext().User);
+            var until = request.Until?.ToDateTimeOffset() ?? DateTimeOffset.UtcNow;
+            until = until.ToOffset(TimeSpan.FromMinutes(request.UntilTzOffsetMinutes));
+            int max_num_emissions_items = request.HasMaxNumEmissionsItems ? 
+                request.MaxNumEmissionsItems : Parameters.USER_SUMMARY_DEFAULT_EMISSIONS_ITEMS;
+            int max_num_expenses_items = request.HasMaxNumExpensesItems ? 
+                request.MaxNumExpensesItems : Parameters.USER_SUMMARY_DEFAULT_EXPENSE_ITEMS;
 
-            until ??= DateTimeOffset.UtcNow;
+            log_.LogInformation("Calculating user summary for {0} until timestamp {1}", user_id, until);
 
-            log_.LogInformation("Calculating user summary for {0} until timestamp {1}", currentUserId(), until);
-
-            var user = await context_.Users.FindAsync(currentUserId());
+            var user = await context_.Users.FindAsync(user_id);
             if (user == null)
-                return NotFound("User not found: " + currentUserId());
+                throw new RpcException(new Status(StatusCode.NotFound, "User not found: " + user_id));
 
             var user_entries = context_.CarbonEntries.Where(e => e.UserId == user.Id);
 
+            var exceeded_emissions = await Core.Queries.GroupEmissionsPerDayAndFindExceeding(
+                    user_entries, until, max_num_emissions_items, user.DailyEmissionsWarningThreshold).ToListAsync();
+            var exceeded_expenses = await Core.Queries.GroupMonthlyExpensesAndFindExceeding(
+                    user_entries, until, max_num_expenses_items, (double)user.MontlyExpensesWarningThreshold).ToListAsync();
+
             return new UserSummary() {
                 UserDailyEmissionsLimit = user.DailyEmissionsWarningThreshold,
-                Emissions = await Core.Queries.GroupEmissionsPerDayAndFindExceeding(
-                    user_entries, until.Value, max_num_emissions_items, user.DailyEmissionsWarningThreshold).ToListAsync(),
-                UserMonthlyExpensesLimit = user.MontlyExpensesWarningThreshold,
-                Expenses = await Core.Queries.GroupMonthlyExpensesAndFindExceeding(
-                    user_entries, until.Value, max_num_expenses_items, user.MontlyExpensesWarningThreshold).ToListAsync()
+                Emissions = { exceeded_emissions },
+                UserMonthlyExpensesLimit = (double) user.MontlyExpensesWarningThreshold,
+                Expenses = { exceeded_expenses }
             };
         }
+
+        string currentUserId(ClaimsPrincipal user) => user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        readonly ApplicationDbContext context_;
+        readonly ILogger log_;
     }
 }

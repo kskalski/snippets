@@ -45,7 +45,7 @@ namespace Emissions.Core {
                 });
         }
 
-        public static IQueryable<UserSummary.EmissionsExceededItem> GroupEmissionsPerDayAndFindExceeding(
+        public static IQueryable<UserSummary.Types.EmissionsExceededItem> GroupEmissionsPerDayAndFindExceeding(
             IQueryable<CarbonEntry> source,
             DateTimeOffset until_timestamp,
             int max_num_items,
@@ -56,20 +56,21 @@ namespace Emissions.Core {
             return source
                 .Where(e => e.EmittedTimestamp < until_timestamp.UtcDateTime)
                 .GroupBy(e => e.EmittedTimestamp.AddHours(utc_to_user_offset_h).Date)
-                .Select(g => new UserSummary.EmissionsExceededItem() {
-                    Day = g.Key.AddHours(-utc_to_user_offset_h),
-                    Emissions = g.Sum(e => e.Emissions)
-                })
+                .Select(g => new { Day = g.Key, Emissions = g.Sum(e => e.Emissions) })
                 .Where(e => e.Emissions > emissions_threshold)
                 .OrderByDescending(e => e.Day)
-                .Take(max_num_items);
+                .Take(max_num_items)
+                .Select(e => new UserSummary.Types.EmissionsExceededItem() {
+                    Day = GPW.Timestamp.FromDateTime(e.Day.AddHours(-utc_to_user_offset_h)),
+                    Emissions = e.Emissions
+                });
         }
 
-        public static IQueryable<UserSummary.ExpensesExceededItem> GroupMonthlyExpensesAndFindExceeding(
+        public static IQueryable<UserSummary.Types.ExpensesExceededItem> GroupMonthlyExpensesAndFindExceeding(
             IQueryable<CarbonEntry> source,
             DateTimeOffset until_timestamp,
             int max_num_items,
-            decimal expenses_threshold) {
+            double expenses_threshold) {
 
             until_timestamp = Utils.Dates.MoveUpToNearestMonthStart(until_timestamp);
             var utc_to_user_offset_h = until_timestamp.Offset.TotalHours;
@@ -79,10 +80,10 @@ namespace Emissions.Core {
                     e.EmittedTimestamp.AddHours(utc_to_user_offset_h).Year,
                     e.EmittedTimestamp.AddHours(utc_to_user_offset_h).Month
                 })
-                .Select(g => new UserSummary.ExpensesExceededItem() {
+                .Select(g => new UserSummary.Types.ExpensesExceededItem() {
                     Year = g.Key.Year,
                     Month = g.Key.Month,
-                    Expenses = g.Sum(e => e.Price!.Value)
+                    Expenses = (double) g.Sum(e => e.Price!.Value)
                 })
                 .Where(e => e.Expenses > expenses_threshold)
                 .OrderByDescending(e => e.Year).ThenByDescending(e => e.Month)

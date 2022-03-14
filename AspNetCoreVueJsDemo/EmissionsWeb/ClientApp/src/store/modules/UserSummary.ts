@@ -1,13 +1,18 @@
-﻿import axios from 'axios';
-import * as vuex from 'vuex';
+﻿import * as vuex from 'vuex';
 import { UserSummaryState, RootState } from '@/store/store-types';
 import { AccountsStore } from './Accounts';
 import { DatesUtil } from '../DatesUtil';
-
-const USER_SUMMARY_API_ENDPOINT = '/api/UserSummary';
+import * as reports_pb from '../../protos/reports';
+import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
+import { UserSummariesClient } from '../../protos/services.client';
+import { Timestamp } from '../../protos/google/protobuf/timestamp';
 
 function client(rootGetters: any) {
-    return axios.create(rootGetters[AccountsStore.MODULE + AccountsStore.GET_REQUEST_HEADERS]);
+    const meta = rootGetters[AccountsStore.MODULE + AccountsStore.GET_REQUEST_HEADERS].headers;
+    const transport = new GrpcWebFetchTransport({
+        baseUrl: window.location.origin, meta
+    });
+    return new UserSummariesClient(transport);
 }
 
 export enum UserSummaryStore {
@@ -25,49 +30,49 @@ export enum UserSummaryStore {
 }
 
 const state: UserSummaryState = {
-    Emissions: [],
-    Expenses: [],
-    UserDailyEmissionsLimit: 0,
-    UserMonthlyExpensesLimit: 0,
-    DismissEmissionsWarningUpTo: { Day: new Date(0, 0, 0), Emissions: 0 },
-    DismissExpensesWarningUpTo: { Year: 0, Month: 0, Expenses: 0 }
+    emissions: [],
+    expenses: [],
+    userDailyEmissionsLimit: 0,
+    userMonthlyExpensesLimit: 0,
+    DismissEmissionsWarningUpTo: { day: { seconds: 0, nanos: 0 }, emissions: 0 },
+    DismissExpensesWarningUpTo: { year: 0, month: 0, expenses: 0 }
 }
 
 const mutations: vuex.MutationTree<UserSummaryState> = {
-    [UserSummaryStore.UPDATE_SUMMARY](state, payload) {
-        DatesUtil.TransformStringsAsDates(payload);
+    [UserSummaryStore.UPDATE_SUMMARY](state, payload: reports_pb.UserSummary) {
         Object.assign(state, payload);
     },
     [UserSummaryStore.UPDATE_DISMISS_POINTS](state) {
-        if (state.Emissions.length)
-            state.DismissEmissionsWarningUpTo = { ...state.Emissions[0] };
-        if (state.Expenses.length)
-            state.DismissExpensesWarningUpTo = { ...state.Expenses[0] };
+        if (state.emissions.length)
+            state.DismissEmissionsWarningUpTo = { ...state.emissions[0] };
+        if (state.expenses.length)
+            state.DismissExpensesWarningUpTo = { ...state.expenses[0] };
     }
 }
 
 const getters: vuex.GetterTree<UserSummaryState, RootState> = {
     [UserSummaryStore.GET_SHOW_CALORIES_WARNING](state) {
-        const dismiss_time = state.DismissEmissionsWarningUpTo.Day.getTime();
-        return state.Emissions.some(e => e.Day.getTime() > dismiss_time ||
-            e.Day.getTime() == dismiss_time && e.Emissions > state.DismissEmissionsWarningUpTo.Emissions);
+        const dismiss_time = state.DismissEmissionsWarningUpTo.day!.seconds!;
+        return state.emissions.some(e => e.day!.seconds > dismiss_time ||
+            e.day!.seconds == dismiss_time && e.emissions > state.DismissEmissionsWarningUpTo.emissions);
     },
     [UserSummaryStore.GET_SHOW_EXPENSES_WARNING](state) {
-        const dismiss_time = state.DismissExpensesWarningUpTo.Year * 100 + state.DismissExpensesWarningUpTo.Month;
-        return state.Expenses.some(e => {
-            const time = e.Year * 100 + e.Month;
-            return time > dismiss_time || time == dismiss_time && e.Expenses > state.DismissExpensesWarningUpTo.Expenses
+        const dismiss_time = state.DismissExpensesWarningUpTo.year * 100 + state.DismissExpensesWarningUpTo.month;
+        return state.expenses.some(e => {
+            const time = e.year * 100 + e.month;
+            return time > dismiss_time || time == dismiss_time && e.expenses > state.DismissExpensesWarningUpTo.expenses
         });
     },
 }
 
 const actions: vuex.ActionTree<UserSummaryState, RootState> = {
     async [UserSummaryStore.DO_FETCH_SUMMARY]({ commit, rootGetters }) {
-        const response = await client(rootGetters).get(USER_SUMMARY_API_ENDPOINT, {
-            params: { until: DatesUtil.DateStringWithOffset(new Date()) }
+        const now = new Date();
+        const call = await client(rootGetters).getUserSummaryOfExceededThresholds({
+            until: Timestamp.fromDate(now),
+            untilTzOffsetMinutes: now.getTimezoneOffset()
         });
-        if (response.status == 200)
-            commit(UserSummaryStore.UPDATE_SUMMARY, response.data);
+        commit(UserSummaryStore.UPDATE_SUMMARY, call.response);
     },
 }
 

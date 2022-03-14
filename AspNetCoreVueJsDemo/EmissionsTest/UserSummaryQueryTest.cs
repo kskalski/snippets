@@ -1,3 +1,4 @@
+using Emissions.Proto.Reports;
 using Emissions.Data;
 using NUnit.Framework;
 using System;
@@ -11,11 +12,11 @@ namespace Emissions.Test {
             entries_.Clear();
         }
 
-        List<UserSummary.EmissionsExceededItem> run_emissions_query(DateTimeOffset until_timestamp, int max_items, double threshold) {
+        List<UserSummary.Types.EmissionsExceededItem> run_emissions_query(DateTimeOffset until_timestamp, int max_items, double threshold) {
             return Core.Queries.GroupEmissionsPerDayAndFindExceeding(
                 entries_.AsQueryable(), until_timestamp, max_items, threshold).ToList();
         }
-        List<UserSummary.ExpensesExceededItem> run_expenses_query(DateTimeOffset until_timestamp, int max_items, decimal threshold) {
+        List<UserSummary.Types.ExpensesExceededItem> run_expenses_query(DateTimeOffset until_timestamp, int max_items, double threshold) {
             return Core.Queries.GroupMonthlyExpensesAndFindExceeding(
                 entries_.AsQueryable(), until_timestamp, max_items, threshold).ToList();
         }

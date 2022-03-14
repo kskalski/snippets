@@ -18,17 +18,6 @@ export class DatesUtil {
     static AddDays(base: Date, days_diff: number): Date {
         return new Date(base.setDate(base.getDate() + days_diff));
     }
-    // Serializes date to string similar to ISO, but using current timezone and including its offset.
-    static DateStringWithOffset(date: Date) {
-        const timezoneOffsetInHours = -(date.getTimezoneOffset() / 60); //UTC minus local time
-        const correctedDate = new Date(date.getTime());
-        correctedDate.setHours(date.getHours() + timezoneOffsetInHours);
-        var iso = correctedDate.toISOString().replace('Z', '');
-        const sign = timezoneOffsetInHours >= 0 ? '+' : '-';
-        const leadingZero = (Math.abs(timezoneOffsetInHours) < 10) ? '0' : '';
-        // TODO: handle non-whole-hour timezones
-        return `${iso}${sign}${leadingZero}${Math.abs(timezoneOffsetInHours)}:00`;
-    }
     static NearestMidnight(after: Date) {
         return new Date(after.setHours(24, 0, 0, 0));
     }

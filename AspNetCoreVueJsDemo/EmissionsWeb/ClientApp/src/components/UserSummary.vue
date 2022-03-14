@@ -36,9 +36,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="entry of emissions" v-bind:key="entry.Day">
-                                    <td class="cell">{{ entry.Day.toLocaleDateString() }}</td>
-                                    <td class="cell">{{ entry.Emissions }}</td>
+                                <tr v-for="entry of emissions" v-bind:key="entry.day!.seconds">
+                                    <td class="cell">{{ emissionsPeriodName(entry) }}</td>
+                                    <td class="cell">{{ entry.emissions }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -66,7 +66,7 @@
                             <tbody>
                                 <tr v-for="(entry, idx) of expenses" v-bind:key="idx">
                                     <td class="cell">{{ expensePeriodName(entry) }}</td>
-                                    <td class="cell">{{ entry.Expenses }}</td>
+                                    <td class="cell">{{ entry.expenses }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -84,9 +84,11 @@
 <script lang="ts">
     import { Action, Mutation, State } from 's-vuex-class';
     import { Vue, Options } from 'vue-decorator';
-import { DatesUtil } from '../store/DatesUtil';
+    import { Timestamp } from '../protos/google/protobuf/timestamp';
+    import { UserSummary_EmissionsExceededItem, UserSummary_ExpensesExceededItem } from '../protos/reports';
+    import { DatesUtil } from '../store/DatesUtil';
     import { UserSummaryStore } from '../store/modules/UserSummary';
-    import { RootState, UserSummary_EmissionsExceededItem, UserSummary_ExpensesExceededItem } from '../store/store-types';
+    import { RootState } from '../store/store-types';
     import AppCard from './Blocks/AppCard.vue';
     import AppPage from './Blocks/AppPage.vue';
 
@@ -97,15 +99,15 @@ import { DatesUtil } from '../store/DatesUtil';
         }
     })
     export default class UserSummary extends Vue {
-        @State((state: RootState) => state.UserSummary.Expenses)
+        @State((state: RootState) => state.UserSummary.expenses)
         expenses: UserSummary_ExpensesExceededItem[];
 
-        @State((state: RootState) => state.UserSummary.Emissions)
+        @State((state: RootState) => state.UserSummary.emissions)
         emissions: UserSummary_EmissionsExceededItem[];
 
-        @State((state: RootState) => state.UserSummary.UserDailyEmissionsLimit)
+        @State((state: RootState) => state.UserSummary.userDailyEmissionsLimit)
         emissionsLimit: number;
-        @State((state: RootState) => state.UserSummary.UserMonthlyExpensesLimit)
+        @State((state: RootState) => state.UserSummary.userMonthlyExpensesLimit)
         expensesLimit: number;
 
         @Mutation(UserSummaryStore.MODULE + UserSummaryStore.UPDATE_DISMISS_POINTS)
@@ -115,11 +117,11 @@ import { DatesUtil } from '../store/DatesUtil';
         doRefreshSummary: () => Promise<void>;
 
         emissionsPeriodName(emissions_item: UserSummary_EmissionsExceededItem) {
-            return emissions_item.Day.toLocaleDateString();
+            return Timestamp.toDate(emissions_item.day!).toLocaleDateString();
         }
 
         expensePeriodName(expense: UserSummary_ExpensesExceededItem) {
-            return DatesUtil.formatMonth(new Date(expense.Year, expense.Month - 1));
+            return DatesUtil.formatMonth(new Date(expense.year, expense.month - 1));
         }
 
         async created() {

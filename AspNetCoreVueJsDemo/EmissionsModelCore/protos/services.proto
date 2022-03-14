@@ -12,3 +12,7 @@ service WebNotifier {
 service AdminReports {
   rpc Report(reports.AdminReportRequest) returns (reports.AdminReport);
 }
+
+service UserSummaries {
+  rpc GetUserSummaryOfExceededThresholds(reports.UserSummaryRequest) returns (reports.UserSummary);
+}

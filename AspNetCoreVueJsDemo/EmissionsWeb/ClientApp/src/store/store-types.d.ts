@@ -1,4 +1,4 @@
-﻿import { AdminReport } from "../protos/reports";
+﻿import { AdminReport, UserSummary, UserSummary_EmissionsExceededItem, UserSummary_ExpensesExceededItem } from "../protos/reports";
 
 export interface CarbonEntriesState {
     CurrentEntries: CarbonEntry[];
@@ -7,11 +7,7 @@ export interface CarbonEntriesState {
     Errors: Record<string, string[]>;
 }
 
-export interface UserSummaryState {
-    Emissions: UserSummary_EmissionsExceededItem[];
-    Expenses: UserSummary_ExpensesExceededItem[];
-    UserDailyEmissionsLimit: number;
-    UserMonthlyExpensesLimit: number;
+export interface UserSummaryState extends UserSummary {
     DismissEmissionsWarningUpTo: UserSummary_EmissionsExceededItem;
     DismissExpensesWarningUpTo: UserSummary_ExpensesExceededItem;
 }
@@ -35,14 +31,4 @@ export interface CarbonEntry {
     EmittedTimestamp: Date;
     Emissions: number;
     Price?: number | null;
-}
-
-export interface UserSummary_EmissionsExceededItem {
-    Day: Date;
-    Emissions: number;
-}
-export interface UserSummary_ExpensesExceededItem {
-    Year: number;
-    Month: number;
-    Expenses: number;
 }
