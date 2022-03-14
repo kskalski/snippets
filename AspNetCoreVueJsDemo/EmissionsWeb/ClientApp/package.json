@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vue-tsc --noEmit && vite build",
     "serve": "vite",
     "lint": "vite lint"
   },
@@ -40,6 +40,7 @@
     "sass": "1.49.8",
     "sass-loader": "12.6.0",
     "typescript": "4.5.5",
+    "vue-tsc": "0.33.1",
     "vite": "2.8.3"
   },
   "browserslist": [

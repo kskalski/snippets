@@ -15,7 +15,7 @@
                                     </div>
                                     <div class="col-auto">
                                         <input type="date" id="emitted-since" name="emitted-since" class="form-control search-orders"
-                                               :value="emittedSince" @change="updateEmittedSince($event.target.value); doRefreshEntries()" >
+                                               :value="emittedSince" @change="datesChanged($event.target, 'since')" >
                                     </div>
                                     <div class="col"></div>
                                     <div class="col-auto">
@@ -23,7 +23,7 @@
                                     </div>
                                     <div class="col-auto">
                                         <input type="date" id="emitted-until" name="emitted-until" class="form-control search-orders"
-                                               :value="emittedUntil" @change="updateEmittedUntil($event.target.value); doRefreshEntries()" >
+                                               :value="emittedUntil" @change="datesChanged($event.target, 'until')" >
                                     </div>
                                 </form>
 
@@ -108,6 +108,15 @@ export default class CarbonEntries extends Vue {
 
     @Action(CarbonEntriesStore.MODULE + CarbonEntriesStore.DO_FETCH_ENTRIES)
     doRefreshEntries: () => Promise<void>;
+
+    datesChanged(target: EventTarget | null, type: "since" | "until") {
+        const val = (target as HTMLInputElement).value ?? "";
+        if (type == "since")
+            this.updateEmittedSince(val);
+        else
+            this.updateEmittedUntil(val);
+        this.doRefreshEntries();
+    }
 
     created() {
         this.doRefreshEntries();

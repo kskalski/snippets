@@ -34,13 +34,23 @@
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Compile Remove="ClientApp\src\protos\**" />
     <Content Remove="$(SpaRoot)**" />
+    <Content Remove="ClientApp\src\protos\**" />
+    <EmbeddedResource Remove="ClientApp\src\protos\**" />
     <None Remove="$(SpaRoot)**" />
+    <None Remove="ClientApp\src\protos\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="ClientApp\src\fortawesome.ts" />
+    <None Remove="ClientApp\src\protos\google\protobuf\duration.ts" />
+    <None Remove="ClientApp\src\protos\google\protobuf\timestamp.ts" />
+    <None Remove="ClientApp\src\protos\notifications.ts" />
+    <None Remove="ClientApp\src\protos\reports.ts" />
+    <None Remove="ClientApp\src\protos\services.client.ts" />
+    <None Remove="ClientApp\src\protos\services.ts" />
     <None Remove="ClientApp\src\store\DatesUtil.ts" />
     <None Remove="ClientApp\src\store\index.ts" />
     <None Remove="ClientApp\src\store\modules\Accounts.ts" />
@@ -62,7 +72,6 @@
 
   <ItemGroup>
     <Folder Include="ClientApp\src\assets\" />
-    <Folder Include="ClientApp\src\protos\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,7 +89,7 @@
   <Target Name="ProtoCompile" Inputs="@(Protobuf_Input)" Outputs="@(Protobuf_Input -> '$(Protobuf_TsOut)\%(RelativeDir)%(Filename).ts')" DependsOnTargets="Protobuf_ResolvePlatform" BeforeTargets="Build">
 	<PropertyGroup>
 		<Protobuf_TsPlugin>$(SpaRoot)node_modules\.bin\protoc-gen-ts.cmd</Protobuf_TsPlugin>
-		<ProtoCCommand>$(Protobuf_ProtocFullPath) --plugin=protoc-gen-ts="$(Protobuf_TsPlugin)" --ts_opt generate_dependencies --ts_out="$(Protobuf_TsOut)" -I "$(Protobuf_StandardImportsPath)" -I "$(Protobuf_Root)"</ProtoCCommand>
+		<ProtoCCommand>$(Protobuf_ProtocFullPath) --plugin=protoc-gen-ts="$(Protobuf_TsPlugin)" --ts_opt generate_dependencies,long_type_number --ts_out="$(Protobuf_TsOut)" -I "$(Protobuf_StandardImportsPath)" -I "$(Protobuf_Root)"</ProtoCCommand>
 	</PropertyGroup>
 	<Message Importance="high" Text="$(ProtoCCommand) @(Protobuf_Input, ' ')" />
 	<Exec Command="$(ProtoCCommand) @(Protobuf_Input, ' ')" />

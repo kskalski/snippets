@@ -4,6 +4,7 @@
     "module": "es2020",
     "strict": true,
     "strictPropertyInitialization": false,
+    "skipLibCheck": true,
     "jsx": "preserve",
     "experimentalDecorators": true,
     "moduleResolution": "node",

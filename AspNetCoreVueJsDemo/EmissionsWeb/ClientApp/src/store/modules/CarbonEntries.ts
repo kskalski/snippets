@@ -99,7 +99,7 @@ const actions: vuex.ActionTree<CarbonEntriesState, RootState> = {
                 await client(rootGetters).put(`${CARBON_ENTRIES_API_ENDPOINT}/${entry.Id}`, entry);
             else
                 await client(rootGetters).post(CARBON_ENTRIES_API_ENDPOINT, entry);
-        } catch (e) {
+        } catch (e: any) {
             commit(CarbonEntriesStore.UPDATE_ERROR, e.response?.data ?? { error: e });
             return false;
         }
