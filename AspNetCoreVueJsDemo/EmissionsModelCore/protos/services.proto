@@ -2,6 +2,7 @@
 
 package emissions.proto.services;
 
+import "carbon.proto";
 import "notifications.proto";
 import "reports.proto";
 
@@ -15,4 +16,12 @@ service AdminReports {
 
 service UserSummaries {
   rpc GetUserSummaryOfExceededThresholds(reports.UserSummaryRequest) returns (reports.UserSummary);
+}
+
+service CarbonEntries {
+  rpc GetEntries(GetCarbonEntriesRequest) returns (GetCarbonEntriesResponse);
+  rpc GetEntry(CarbonEntry) returns (CarbonEntry);
+  rpc AddEntry(CarbonEntry) returns (CarbonEntry);
+  rpc UpdateEntry(CarbonEntry) returns (CarbonEntry);
+  rpc DeleteEntry(CarbonEntry) returns (CarbonEntry);
 }

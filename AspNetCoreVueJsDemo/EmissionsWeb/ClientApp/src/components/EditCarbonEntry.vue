@@ -21,7 +21,7 @@
                             <form class="settings-form">
                                 <div class="mb-3" v-if="isAdmin">
                                     <label for="carbon-entry-input-1" class="form-label">User</label>
-                                    <select class="form-control" id="carbon-entry-user" v-model="carbonEntry.UserId">
+                                    <select class="form-control" id="carbon-entry-user" v-model="carbonEntry.userId">
                                          <option>- select -</option>
                                          <option v-for="(user_name, user_id) in userNameById" :value="user_id">
                                             {{user_name}}
@@ -30,7 +30,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="carbon-entry-input-1" class="form-label">Activity/product name</label>
-                                    <input type="text" class="form-control" id="carbon-entry-input-1" v-model.trim='carbonEntry.Name' required>
+                                    <input type="text" class="form-control" id="carbon-entry-input-1" v-model.trim='carbonEntry.name' required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="carbon-entry-input-2" class="form-label">Emission time</label>
@@ -38,11 +38,11 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="carbon-entry-input-3" class="form-label">Emissions</label>
-                                    <input type="number" class="form-control" id="carbon-entry-input-3" v-model='carbonEntry.Emissions' required>
+                                    <input type="number" class="form-control" id="carbon-entry-input-3" v-model='carbonEntry.emissions' required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="carbon-entry-input-4" class="form-label">Price</label>
-                                    <input type="number" class="form-control" id="carbon-entry-input-4" v-model='carbonEntry.Price'>
+                                    <input type="number" class="form-control" id="carbon-entry-input-4" v-model='carbonEntry.price'>
                                 </div>
                             </form>
                         </div>
@@ -63,11 +63,13 @@
 <script lang="ts">
     import { Vue, Options, Prop } from 'vue-decorator';
     import * as bicon from 'bootstrap-icons-vue';
-    import { CarbonEntry, RootState } from '../store/store-types';
+    import { RootState } from '../store/store-types';
     import { Action, Getter, Mutation, State } from 's-vuex-class';
     import { CarbonEntriesStore } from '../store/modules/CarbonEntries';
     import { DatesUtil } from '../store/DatesUtil';
     import { AccountsStore } from '../store/modules/Accounts';
+    import { CarbonEntry } from '../protos/carbon';
+    import { Timestamp } from '../protos/google/protobuf/timestamp';
 
     @Options({
         components: {
@@ -102,15 +104,15 @@
         carbonEntry: CarbonEntry | null = null;
 
         get emittedTimestamp() {
-            return DatesUtil.DateToDatetimeInputString(this.carbonEntry!.EmittedTimestamp);
+            return DatesUtil.DateToDatetimeInputString(Timestamp.toDate(this.carbonEntry!.emittedTimestamp!));
         }
         set emittedTimestamp(val: string) {
-            this.carbonEntry!.EmittedTimestamp = new Date(val);
+            this.carbonEntry!.emittedTimestamp = Timestamp.fromDate(new Date(val));
         }
 
         async handleSave() {
-            if (!this.carbonEntry!.Price)
-                this.carbonEntry!.Price = null;
+            if (!this.carbonEntry!.price)
+                this.carbonEntry!.price = undefined;
             if (await this.doSaveEntry(this.carbonEntry!))
                 this.handleBack();
         }
@@ -126,7 +128,7 @@
             if (this.entryId > 0)
                 this.carbonEntry = await this.doGetEntry(this.entryId);
             else
-                this.carbonEntry = { Id: 0, Name: '', EmittedTimestamp: new Date(), Emissions: 1, UserId: '' };
+                this.carbonEntry = { id: 0, name: '', emittedTimestamp: Timestamp.now(), emissions: 1, userId: '' };
             if (this.carbonEntry)
                 this.updateError(null);
             else

@@ -1,0 +1,30 @@
+﻿syntax = "proto3";
+
+package emissions.proto;
+
+import "google/protobuf/timestamp.proto";
+
+message CarbonEntry {
+  int64 Id = 1;
+
+  string UserId = 2;
+
+  google.protobuf.Timestamp EmittedTimestamp = 3;
+
+  string Name = 4;
+
+  double Emissions = 5;
+
+  optional double Price = 6;
+}
+
+message GetCarbonEntriesRequest {
+  google.protobuf.Timestamp EmittedSince = 1;
+  google.protobuf.Timestamp EmittedUntil = 2;
+  int32 Offset = 3;
+  optional int32 Limit = 4;
+}
+
+message GetCarbonEntriesResponse {
+  repeated CarbonEntry Entries = 1;
+}

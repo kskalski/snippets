@@ -1,4 +1,5 @@
-﻿import { AdminReport, UserSummary, UserSummary_EmissionsExceededItem, UserSummary_ExpensesExceededItem } from "../protos/reports";
+﻿import { CarbonEntry } from "../protos/carbon";
+import { AdminReport, UserSummary, UserSummary_EmissionsExceededItem, UserSummary_ExpensesExceededItem } from "../protos/reports";
 
 export interface CarbonEntriesState {
     CurrentEntries: CarbonEntry[];
@@ -22,13 +23,4 @@ export interface RootState {
     CarbonEntries: CarbonEntriesState;
     AdminReportModule: AdminReport;
     UserSummary: UserSummaryState;
-}
-
-export interface CarbonEntry {
-    Id: number;
-    UserId: string;
-    Name: string;
-    EmittedTimestamp: Date;
-    Emissions: number;
-    Price?: number | null;
 }

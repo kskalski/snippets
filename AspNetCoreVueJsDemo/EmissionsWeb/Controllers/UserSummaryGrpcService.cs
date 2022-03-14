@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 
 namespace Emissions.Controllers {
     [Authorize]
-    public class UserSummaryController : Proto.Services.UserSummaries.UserSummariesBase {
-        public UserSummaryController(ApplicationDbContext context, ILogger<UserSummaryController> logger) {
+    public class UserSummaryGrpcService : Proto.Services.UserSummaries.UserSummariesBase {
+        public UserSummaryGrpcService(ApplicationDbContext context, ILogger<UserSummaryGrpcService> logger) {
             context_ = context;
             log_ = logger;
         }

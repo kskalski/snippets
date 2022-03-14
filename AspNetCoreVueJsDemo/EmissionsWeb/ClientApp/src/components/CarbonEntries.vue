@@ -55,12 +55,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="entry of entries" v-bind:key="entry.Id">
-                                        <td v-if="isAdmin" class="cell">{{userNameById[entry.UserId]}}</td>
-                                        <td class="cell"><router-link :to="{ path: '/carbon_entry/' + entry.Id }">{{ entry.Name }}</router-link></td>
-                                        <td class="cell">{{ entry.EmittedTimestamp.toLocaleString() }}</td>
-                                        <td class="cell">{{ entry.Emissions }}</td>
-                                        <td class="cell">{{ entry.Price }}</td>
+                                    <tr v-for="entry of entries" v-bind:key="entry.id">
+                                        <td v-if="isAdmin" class="cell">{{userNameById[entry.userId]}}</td>
+                                        <td class="cell"><router-link :to="{ path: '/carbon_entry/' + entry.id }">{{ entry.name }}</router-link></td>
+                                        <td class="cell">{{ entryDisplayDate(entry) }}</td>
+                                        <td class="cell">{{ entry.emissions }}</td>
+                                        <td class="cell">{{ entry.price }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -76,10 +76,12 @@
 <script lang="ts">
 import { Vue, Options } from 'vue-decorator';
 import { Action, Getter, Mutation, State } from 's-vuex-class';
-import { CarbonEntry, RootState } from '../store/store-types';
+import { RootState } from '../store/store-types';
 import AppPage from './Blocks/AppPage.vue';
 import { CarbonEntriesStore } from '../store/modules/CarbonEntries';
 import { AccountsStore } from '../store/modules/Accounts';
+import { CarbonEntry } from '../protos/carbon';
+import { Timestamp } from '../protos/google/protobuf/timestamp';
 
 @Options({
     components: {
@@ -108,6 +110,10 @@ export default class CarbonEntries extends Vue {
 
     @Action(CarbonEntriesStore.MODULE + CarbonEntriesStore.DO_FETCH_ENTRIES)
     doRefreshEntries: () => Promise<void>;
+
+    entryDisplayDate(entry: CarbonEntry) {
+        return Timestamp.toDate(entry.emittedTimestamp!).toLocaleString();
+    }
 
     datesChanged(target: EventTarget | null, type: "since" | "until") {
         const val = (target as HTMLInputElement).value ?? "";

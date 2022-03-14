@@ -1,17 +1,18 @@
-﻿import axios from 'axios';
-import * as vuex from 'vuex';
-import { CarbonEntriesState, CarbonEntry, RootState } from '@/store/store-types';
+﻿import * as vuex from 'vuex';
+import { CarbonEntriesState, RootState } from '@/store/store-types';
 import { AccountsStore } from './Accounts';
 import { DatesUtil } from '../DatesUtil';
+import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
+import * as carbon_pb from '../../protos/carbon';
+import * as services_pb from '../../protos/services.client';
+import { Timestamp } from '../../protos/google/protobuf/timestamp';
 
-const CARBON_ENTRIES_API_ENDPOINT = '/api/CarbonEntries';
-
-const SKIP_CACHE_HEADERS = { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' };
-function client(rootGetters: any, skip_cache = false) {
-    const config = rootGetters[AccountsStore.MODULE + AccountsStore.GET_REQUEST_HEADERS];
-    if (skip_cache)
-        Object.assign(config.headers, SKIP_CACHE_HEADERS);
-    return axios.create(config);
+function client(rootGetters: any) {
+    const meta = rootGetters[AccountsStore.MODULE + AccountsStore.GET_REQUEST_HEADERS].headers;
+    const transport = new GrpcWebFetchTransport({
+        baseUrl: window.location.origin, meta
+    });
+    return new services_pb.CarbonEntriesClient(transport);
 }
 
 export enum CarbonEntriesStore {
@@ -39,9 +40,8 @@ const state: CarbonEntriesState = {
 }
 
 const mutations: vuex.MutationTree<CarbonEntriesState> = {
-    [CarbonEntriesStore.UPDATE_ENTRIES](state: CarbonEntriesState, payload: CarbonEntry[]) {
-        DatesUtil.TransformStringsAsDates(payload);
-        state.CurrentEntries = payload;
+    [CarbonEntriesStore.UPDATE_ENTRIES](state: CarbonEntriesState, payload: carbon_pb.GetCarbonEntriesResponse) {
+        state.CurrentEntries = payload.entries;
     },
     [CarbonEntriesStore.UPDATE_TAKEN_SINCE](state: CarbonEntriesState, payload: string) {
         state.EmittedSince = payload;
@@ -63,42 +63,38 @@ const getters: vuex.GetterTree<CarbonEntriesState, RootState> = {
 }
 
 const actions: vuex.ActionTree<CarbonEntriesState, RootState> = {
-    async [CarbonEntriesStore.DO_FETCH_ENTRIES]({ commit, rootGetters, state }, skip_browser_cache = false) {
-        const filter_params = {} as any;
+    async [CarbonEntriesStore.DO_FETCH_ENTRIES]({ commit, rootGetters, state }) {
+        const filter_params = { offset: 0 } as carbon_pb.GetCarbonEntriesRequest;
         if (state.EmittedSince)
-            filter_params.emitted_since = DatesUtil.ParseDayStringAsFullDate(state.EmittedSince);
+            filter_params.emittedSince = Timestamp.fromDate(DatesUtil.ParseDayStringAsFullDate(state.EmittedSince));
 
         if (state.EmittedUntil) {
             // API upper time limit is exclusive, so extend the value by one day
-            filter_params.emitted_until = DatesUtil.AddDays(DatesUtil.ParseDayStringAsFullDate(state.EmittedUntil), 1);
+            filter_params.emittedUntil = Timestamp.fromDate(DatesUtil.AddDays(DatesUtil.ParseDayStringAsFullDate(state.EmittedUntil), 1));
         }
 
-        const response = await client(rootGetters, skip_browser_cache).get(CARBON_ENTRIES_API_ENDPOINT, { params: filter_params });
-        if (response.status == 200)
-            commit(CarbonEntriesStore.UPDATE_ENTRIES, response.data);
+        const call = await client(rootGetters).getEntries(filter_params);
+        commit(CarbonEntriesStore.UPDATE_ENTRIES, call.response);
     },
     async [CarbonEntriesStore.DO_GET_ENTRY]({ rootGetters }, id: number) {
-        const response = await client(rootGetters).get<CarbonEntry>(`${CARBON_ENTRIES_API_ENDPOINT}/${id}`);
-        if (response.status == 200) {
-            DatesUtil.TransformStringsAsDates(response.data);
-            return response.data;
-        }
-        return null;
+        const call = await client(rootGetters).getEntry(carbon_pb.CarbonEntry.create({ id: id }));
+        return call.response;
     },
     async [CarbonEntriesStore.DO_DELETE_ENTRY]({ commit, rootGetters }, id: number) {
-        const response = await client(rootGetters).delete(`${CARBON_ENTRIES_API_ENDPOINT}/${id}`);
-        if (response.status != 204) {
-            commit(CarbonEntriesStore.UPDATE_ERROR, response.data ?? { error: response.statusText });
+        try {
+            const call = await client(rootGetters).deleteEntry(carbon_pb.CarbonEntry.create({ id: id }));
+        } catch (e: any) {
+            commit(CarbonEntriesStore.UPDATE_ERROR, e.response.data ?? { error: e.response.statusText });
             return false;
         }
         return true;
     },
-    async [CarbonEntriesStore.DO_SAVE_ENTRY]({ commit, dispatch, rootGetters }, entry: CarbonEntry) {
+    async [CarbonEntriesStore.DO_SAVE_ENTRY]({ commit, rootGetters }, entry: carbon_pb.CarbonEntry) {
         try {
-            if (entry.Id > 0)
-                await client(rootGetters).put(`${CARBON_ENTRIES_API_ENDPOINT}/${entry.Id}`, entry);
+            if (entry.id > 0)
+                await client(rootGetters).updateEntry(entry);
             else
-                await client(rootGetters).post(CARBON_ENTRIES_API_ENDPOINT, entry);
+                await client(rootGetters).addEntry(entry);
         } catch (e: any) {
             commit(CarbonEntriesStore.UPDATE_ERROR, e.response?.data ?? { error: e });
             return false;

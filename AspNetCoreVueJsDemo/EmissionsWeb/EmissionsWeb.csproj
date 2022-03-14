@@ -36,21 +36,13 @@
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Compile Remove="ClientApp\src\protos\**" />
     <Content Remove="$(SpaRoot)**" />
-    <Content Remove="ClientApp\src\protos\**" />
-    <EmbeddedResource Remove="ClientApp\src\protos\**" />
     <None Remove="$(SpaRoot)**" />
-    <None Remove="ClientApp\src\protos\**" />
+    <None Remove="ClientApp\src\protos\**\*" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="ClientApp\src\fortawesome.ts" />
-    <None Remove="ClientApp\src\protos\google\protobuf\duration.ts" />
-    <None Remove="ClientApp\src\protos\google\protobuf\timestamp.ts" />
-    <None Remove="ClientApp\src\protos\notifications.ts" />
-    <None Remove="ClientApp\src\protos\reports.ts" />
-    <None Remove="ClientApp\src\protos\services.client.ts" />
-    <None Remove="ClientApp\src\protos\services.ts" />
     <None Remove="ClientApp\src\store\DatesUtil.ts" />
     <None Remove="ClientApp\src\store\index.ts" />
     <None Remove="ClientApp\src\store\modules\Accounts.ts" />

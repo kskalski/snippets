@@ -65,8 +65,8 @@ namespace Emissions {
             app.UseEndpoints(endpoints => {
                 endpoints.MapGrpcService<Controllers.WebNotifierGrpcService>().EnableGrpcWeb();
                 endpoints.MapGrpcService<Controllers.AdminReportGrpcService>().EnableGrpcWeb();
-                endpoints.MapGrpcService<Controllers.UserSummaryController>().EnableGrpcWeb();
-                endpoints.MapControllers();
+                endpoints.MapGrpcService<Controllers.UserSummaryGrpcService>().EnableGrpcWeb();
+                endpoints.MapGrpcService<Controllers.CarbonEntriesGrpcService>().EnableGrpcWeb();
             });
 
             app.UseSpa(spa => {
