@@ -1,13 +1,10 @@
-﻿export interface CarbonEntriesState {
+﻿import { AdminReport } from "../protos/reports";
+
+export interface CarbonEntriesState {
     CurrentEntries: CarbonEntry[];
     EmittedSince: string | null;
     EmittedUntil: string | null;
     Errors: Record<string, string[]>;
-}
-
-export interface AdminReportState {
-    AddedEntries: AdminReport_AddedEntriesCounts;
-    UsersEmissions: AdminReport_EmissionsByUsers;
 }
 
 export interface UserSummaryState {
@@ -27,7 +24,7 @@ export interface AccountsState {
 export interface RootState {
     Accounts: AccountsState;
     CarbonEntries: CarbonEntriesState;
-    AdminReport: AdminReportState;
+    AdminReportModule: AdminReport;
     UserSummary: UserSummaryState;
 }
 
@@ -38,18 +35,6 @@ export interface CarbonEntry {
     EmittedTimestamp: Date;
     Emissions: number;
     Price?: number | null;
-}
-
-export interface AdminReport_AddedEntriesCounts {
-    PerDayCounts: number[];
-    NumLastWeek: number;
-    NumPrecedingWeek: number;
-}
-
-export interface AdminReport_EmissionsByUsers {
-    NumActiveUsers: number;
-    SumAddedEmissions: number;
-    AverageEmissionsPerUser: number;
 }
 
 export interface UserSummary_EmissionsExceededItem {

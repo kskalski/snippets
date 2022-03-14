@@ -1,5 +1,5 @@
 ﻿<template>
-    <AppPage title="Admin report">
+    <AppPage title="Admin addedEntries">
         <div class="row g-4 mb-4">
             <div class="col-6 col-lg-3">
                 <div class="app-card app-card-stat shadow-sm h-100">
@@ -40,9 +40,10 @@
     import { Vue, Options } from 'vue-decorator';
     import * as bicon from 'bootstrap-icons-vue';
     import { AdminReportStore } from '../store/modules/AdminReport';
-    import { AdminReportState, RootState } from '../store/store-types';
+    import { RootState } from '../store/store-types';
     import AppCard from './Blocks/AppCard.vue';
     import AppPage from './Blocks/AppPage.vue';
+    import { AdminReport_AddedEntriesCounts } from '../protos/reports';
 
     @Options({
         components: {
@@ -52,42 +53,42 @@
             BIconArrowUp: bicon.BIconArrowUp,
         }
     })
-    export default class AdminReport extends Vue {
-        @State((state: RootState) => state.AdminReport)
-        report: AdminReportState;
+    export default class AdminaddedEntriesView extends Vue {
+        @State((state: RootState) => state.AdminReportModule.addedEntries)
+        addedEntries: AdminReport_AddedEntriesCounts;
 
         @Getter(AdminReportStore.MODULE + AdminReportStore.GET_AVERAGE_CALORIES_PER_USER)
         avgEmissions: number;
 
         @Action(AdminReportStore.MODULE + AdminReportStore.DO_FETCH_REPORT)
-        doRefreshReport: () => Promise<void>;
+        doRefreshaddedEntries: () => Promise<void>;
 
         get addedEntriesClass() {
-            if (this.report.AddedEntries.NumLastWeek > this.report.AddedEntries.NumPrecedingWeek)
+            if (this.addedEntries.numLastWeek > this.addedEntries.numPrecedingWeek)
                 return 'text-success';
-            else if (this.report.AddedEntries.NumLastWeek < this.report.AddedEntries.NumPrecedingWeek)
+            else if (this.addedEntries.numLastWeek < this.addedEntries.numPrecedingWeek)
                 return 'text-warning';
             return 'text-info';
         }
 
         get addedEntriesDiffPercent() {
-            if (this.report.AddedEntries.NumPrecedingWeek)
-                return (100 * this.report.AddedEntries.NumLastWeek / this.report.AddedEntries.NumPrecedingWeek).toPrecision(4);
+            if (this.addedEntries.numPrecedingWeek)
+                return (100 * this.addedEntries.numLastWeek / this.addedEntries.numPrecedingWeek).toPrecision(4);
             return 100;
         }
 
         get addedLastWeek() {
-            return this.report.AddedEntries.NumLastWeek.toLocaleString();
+            return this.addedEntries.numLastWeek.toLocaleString();
         }
         get addedPrevWeek() {
-            return this.report.AddedEntries.NumPrecedingWeek.toLocaleString();
+            return this.addedEntries.numPrecedingWeek.toLocaleString();
         }
         get averageEmissionsPerUser() {
             return this.avgEmissions.toFixed(2).toLocaleString();
         }
 
         created() {
-            this.doRefreshReport();
+            this.doRefreshaddedEntries();
         }
     }
 </script>

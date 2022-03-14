@@ -1,0 +1,32 @@
+﻿syntax = "proto3";
+
+package emissions.proto.reports;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message DayCount {
+  google.protobuf.Duration Day = 1;
+  int32 NumEntries = 2;
+}
+
+message AdminReport {
+  message AddedEntriesCounts {
+    repeated int32 PerDayCounts = 1;
+    int32 NumLastWeek = 2;
+    int32 NumPrecedingWeek = 3;
+  }
+
+  message EmissionsByUsers {
+    int32 NumActiveUsers = 1;
+    double SumAddedEmissions = 2;
+    double AverageEmissionsPerUser = 3;
+  }
+
+  AddedEntriesCounts AddedEntries = 1;
+  EmissionsByUsers UsersEmissions  = 2;
+}
+
+message AdminReportRequest {
+  google.protobuf.Timestamp until = 1;
+}

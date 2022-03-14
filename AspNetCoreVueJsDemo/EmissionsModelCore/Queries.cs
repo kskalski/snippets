@@ -1,4 +1,6 @@
-﻿using Emissions.Data;
+﻿using Emissions.Proto.Reports;
+using Emissions.Data;
+using GPW = Google.Protobuf.WellKnownTypes;
 
 namespace Emissions.Core {
     public class Queries {
@@ -14,29 +16,29 @@ namespace Emissions.Core {
             return source
                 .Where(e => e.CreationTimestamp >= since_timestamp && e.CreationTimestamp < until_timestamp)
                 .GroupBy(e => e.CreationTimestamp.AddHours(day_start_h_offset).Date)
-                .Select(g => new DayCount { Day = g.Key.AddHours(-day_start_h_offset) - since_timestamp, NumEntries = g.Count() });
+                .Select(g => new Proto.Reports.DayCount { Day = GPW.Duration.FromTimeSpan(g.Key.AddHours(-day_start_h_offset) - since_timestamp), NumEntries = g.Count() });
         }
-        public static AdminReport.AddedEntriesCounts CalculateAddedEntriesStats(DayCount[] day_counts) {
+        public static AdminReport.Types.AddedEntriesCounts CalculateAddedEntriesStats(Proto.Reports.DayCount[] day_counts) {
             var day_buckets = new int[Parameters.ADMIN_REPORT_ADDED_ENTRIES_WINDOW_DAYS * 2];
             foreach (var item in day_counts) {
-                int day_index = (int)item.Day.TotalDays;
+                int day_index = (int)item.Day.ToTimeSpan().TotalDays;
                 day_buckets[day_index] = item.NumEntries;
             }
-            return new AdminReport.AddedEntriesCounts() {
-                PerDayCounts = day_buckets,
+            return new AdminReport.Types.AddedEntriesCounts() {
+                PerDayCounts = { day_buckets },
                 NumLastWeek = day_buckets.Skip(Parameters.ADMIN_REPORT_ADDED_ENTRIES_WINDOW_DAYS).Sum(),
                 NumPrecedingWeek = day_buckets.Take(Parameters.ADMIN_REPORT_ADDED_ENTRIES_WINDOW_DAYS).Sum()
             };
         }
 
-        public static IQueryable<AdminReport.EmissionsByUsers> EmissionsPerUserStatsQuery(IQueryable<CarbonEntry> source, DateTime until_timestamp) {
+        public static IQueryable<AdminReport.Types.EmissionsByUsers> EmissionsPerUserStatsQuery(IQueryable<CarbonEntry> source, DateTime until_timestamp) {
             var since_timestamp = until_timestamp.AddDays(-Parameters.ADMIN_REPORT_AVG_EMISSIONS_WINDOW_DAYS);
             var filter_query = source.Where(e => e.EmittedTimestamp >= since_timestamp && e.EmittedTimestamp < until_timestamp);
             return filter_query
                 .GroupBy(e => e.UserId)
                 .Select(g => (new { AverageEmissions = g.Average(e => e.Emissions), SumEmissions = g.Sum(e => e.Emissions) }))
                 .GroupBy(e => 1)
-                .Select(e => new AdminReport.EmissionsByUsers() {
+                .Select(e => new AdminReport.Types.EmissionsByUsers() {
                     AverageEmissionsPerUser = e.Average(x => x.AverageEmissions),
                     NumActiveUsers = e.Count(),
                     SumAddedEmissions = e.Sum(e => e.SumEmissions)

@@ -3,7 +3,12 @@
 package emissions.proto.services;
 
 import "notifications.proto";
+import "reports.proto";
 
 service WebNotifier {
   rpc Listen(notifications.ListenRequest) returns (stream notifications.ListenResponse);
+}
+
+service AdminReports {
+  rpc Report(reports.AdminReportRequest) returns (reports.AdminReport);
 }

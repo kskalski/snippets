@@ -1,4 +1,5 @@
 ﻿using Emissions.Data;
+using Emissions.Proto.Reports;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,11 @@ namespace Emissions.Test {
             entries_.Clear();
         }
 
-        AdminReport.AddedEntriesCounts run_added_entries_query(DateTime until_timestamp) {
+        AdminReport.Types.AddedEntriesCounts run_added_entries_query(DateTime until_timestamp) {
             var day_counts = Core.Queries.AddedEntriesDayCountsQuery(entries_.AsQueryable(), until_timestamp).ToArray();
             return Core.Queries.CalculateAddedEntriesStats(day_counts);
         }
-        AdminReport.EmissionsByUsers? run_avg_emissions_query(DateTime until_timestamp) {
+        AdminReport.Types.EmissionsByUsers? run_avg_emissions_query(DateTime until_timestamp) {
             return Core.Queries.EmissionsPerUserStatsQuery(entries_.AsQueryable(), until_timestamp).SingleOrDefault();
         }
 
