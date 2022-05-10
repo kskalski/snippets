@@ -1,7 +1,12 @@
-# Vue 3 + Vite
+Reproduction of problem with configuring esbuild using vite config (see https://github.com/vitejs/vite/issues/6065)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+npm install
+npm run build
+grep foo dist/assets/*
 
-## Recommended IDE Setup
+# Expected output should contain
+.foo{color:red}.bar{color:red}
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+# Actual output contains
+.foo,.bar{color:red}
+
